@@ -1,34 +1,31 @@
 // ============================================================================
-//  THE SWAP POINT FOR YOUR TEAM'S MODEL
+//  WHICH MODEL DRIVES THE RESULTS
 // ----------------------------------------------------------------------------
-//  Every model is a function:  predict(profile) -> Prediction
+//  Default: 'team', the team's linear regression (Ari's R analysis in
+//  musictomentalhealthlm.qmd), stored in src/data/r_model.json.
+//    * To use Ari's exact R coefficients: put r_coefficients.csv at the repo root
+//      and run `npm run model` (see README).
+//  'knn' ("listeners like you") is kept for comparison in the Under the hood panel.
 //
-//    profile.levels  { Classical: 0-3, Country: 0-3, ... }   <- same scale as the
-//                    survey's Never(0) / Rarely(1) / Sometimes(2) / Very frequently(3)
-//    profile.shares  { Classical: 0-1, ... }                 <- share of listening
-//
-//    Prediction = {
-//      scores:   { Anxiety, Depression, Insomnia, OCD }   // 0-10
-//      baseline: { Anxiety, Depression, Insomnia, OCD }   // whole-survey average
-//      improveShare?: number   // 0-1, share saying music improves their mood
-//      method:   string        // one line shown under the chart
-//    }
-//
-//  To plug in a new model:
-//    * Linear/logistic-style: export coefficients to src/data/linear_model.json
-//      (same format) and set ACTIVE_MODEL = 'linear'. No code changes.
-//    * Anything else: add a file next to knn.js, register it in MODELS below.
+//  Every model is a function predict(profile) -> Prediction:
+//    profile.levels  { Classical: 0-3, ... }  Never(0) / Rarely(1) / Sometimes(2) / Very frequently(3)
+//    Prediction = { scores, baseline, improveShare?, method, kind, ... }
 // ============================================================================
 import survey from '../data/survey.json'
-import linearModel from '../data/linear_model.json'
+import teamModel from '../data/r_model.json'
 import { knnPredict } from './knn.js'
 import { linearPredict } from './linear.js'
 
-export const ACTIVE_MODEL = 'knn'
+export const ACTIVE_MODEL = 'team'
 
 export const MODELS = {
+  team: (profile) => linearPredict(profile, teamModel, survey),
   knn: (profile) => knnPredict(profile, survey, { k: 50 }),
-  linear: (profile) => linearPredict(profile, linearModel, survey),
+}
+
+export const MODEL_NAMES = {
+  team: 'Team regression (R)',
+  knn: 'Listeners like you (k-nearest)',
 }
 
 export const CONDITIONS = survey.conditions

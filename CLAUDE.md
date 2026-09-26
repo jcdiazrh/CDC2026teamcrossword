@@ -17,8 +17,9 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
 - No public demo mode: login is the point. `?mock=metal|pop|mixed|nogenres` exists **in dev only**
 - Genre mapping: every Spotify/Last.fm tag goes to the nearest survey genre, plus a neighbour at half weight (`web/src/lib/genreMap.js`)
 - The title must NEVER be based on the mental-health results
-- Framing: "listeners like you reported…", always shown next to the survey average, with a "not a diagnosis" note
-- The team is building better models. `web/src/model/index.js` is the swap point (kNN default; `linear` reads `src/data/linear_model.json`)
+- Framing: "our model predicts for your taste" / "listeners like you reported…", never "you have…"; always shown next to the survey average, with a "not a diagnosis" note
+- **Results use the team's R regression** (Ari, `musictomentalhealthlm.qmd`, `R results.pdf`, `takeaways_from_linear_model`): one lm per condition on 16 binary genres (1 = Sometimes/Very frequently). Stored in `web/src/data/r_model.json`, built by `web/scripts/build_r_model.py`: it uses `r_coefficients.csv` at the repo root if present (exact R numbers), else refits the same spec in Python on all 736 rows. The kNN model is only a comparison toggle in *Under the hood*
+- The card shows which significant effects apply to the user and the honest fit caveat (held-out RMSE ≈ SD; multiple comparisons)
 - Look: artsy, playful, app-like (the team referenced the Chick-fil-A app): cream background, bold colors, chunky offset shadows, Bricolage Grotesque + DM Sans
 
 ## Gotchas
@@ -33,8 +34,9 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
 - `npm run dev`: http://127.0.0.1:5173/
 - `npm run check`: runs the pipeline (genre mapping → profile → both models) on mock listeners
 - `npm run build`, `npm run lint`
-- `npm run data`: regenerate `src/data/survey.json` and the sample `linear_model.json` from the CSV (needs pandas + numpy)
+- `npm run data`: regenerate `src/data/survey.json` from the CSV (needs pandas + numpy)
+- `npm run model`: rebuild `src/data/r_model.json` (from `r_coefficients.csv` if present; the Python refit needs statsmodels)
 
 ## Open ideas / next steps
-- Replace the sample model with the team's model (keep the `predict(profile)` contract)
+- Get Ari to export `r_coefficients.csv` so the site uses the exact R coefficients
 - Grow `genreMap.js` rules using the "Tags with no rule yet" list in the app's *Under the hood* panel

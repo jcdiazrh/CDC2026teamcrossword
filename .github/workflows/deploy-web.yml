@@ -6,7 +6,7 @@ name: Deploy web app
 on:
   push:
     branches: [main]
-    paths: ['codebase/website/mixed-feelings_cd/web/**', '.github/workflows/deploy-web.yml']
+    paths: ['codebase/website/mixed-feelings_cd/web/**', 'r_coefficients.csv', '.github/workflows/deploy-web.yml']
   workflow_dispatch:
 
 permissions:
@@ -32,6 +32,13 @@ jobs:
           cache: npm
           cache-dependency-path: codebase/website/mixed-feelings_cd/web/package-lock.json
       - run: npm ci
+      # If the team uploaded R coefficients (r_coefficients.csv at the repo root), rebuild the model from them
+      - name: Use R coefficients if present
+        run: |
+          if [ -f "$GITHUB_WORKSPACE/r_coefficients.csv" ]; then
+            pip install pandas numpy
+            python3 scripts/build_r_model.py
+          fi
       - run: node scripts/check.mjs
       - run: npm run build
         env:
