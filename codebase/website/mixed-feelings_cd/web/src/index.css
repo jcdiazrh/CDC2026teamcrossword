@@ -353,3 +353,35 @@ body.dark { background: #15101F; color: #F4EDE4; }
 .lift-bar span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--grape), var(--tomato)); transition: width .4s ease; }
 .lift-num { font-variant-numeric: tabular-nums; font-size: 14px; }
 .callout-dark { background: var(--grape); color: #fff; border-color: var(--ink); }
+
+/* ---- model slide inside the Feelings → Music page (Truman <-> Python) ---- */
+.model-slide {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr; background: var(--paper);
+  border: 2.5px solid var(--ink); border-radius: 22px; padding: 5px; box-shadow: 0 4px 0 var(--grape);
+}
+.model-slide-thumb {
+  position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(50% - 5px); border-radius: 16px;
+  background: linear-gradient(135deg, var(--grape), var(--tomato)); transition: transform .45s cubic-bezier(.2, 1.3, .4, 1);
+}
+.model-slide.is-python .model-slide-thumb { transform: translateX(100%); }
+.model-slide button {
+  position: relative; z-index: 1; border: 0; background: transparent; border-radius: 16px; padding: 10px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 1px; color: var(--ink-2); transition: color .3s;
+}
+.model-slide button b { font-family: var(--display); font-weight: 800; font-size: 16px; }
+.model-slide button small { font-size: 12px; }
+.model-slide button.on { color: #fff; }
+.model-slide button:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+.feel-extra { display: flex; flex-direction: column; gap: 18px; border-top: 2px dashed var(--line); padding-top: 18px; animation: rise .4s ease both; }
+.feel-extra-note { margin: 0; font-size: 13px; color: var(--ink-2); }
+.service-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.service-pills button {
+  border: 2px solid var(--ink); background: transparent; border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 14px;
+  transition: background .2s, color .2s;
+}
+.service-pills button.on { background: var(--ink); color: var(--cream); }
+.feel-lean { margin: 0; font-family: var(--display); font-weight: 700; color: var(--ink-2); font-size: 16px; }
+.model-note { margin-top: 14px; font-size: 14px; color: var(--ink-2); background: rgba(143, 124, 255, .12); border-radius: 16px; padding: 12px 14px; }
+.model-note b { color: var(--ink); }
+.model-src { display: block; margin-top: 6px; font-size: 12px; opacity: .8; }

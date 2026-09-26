@@ -1,0 +1,216 @@
+{
+ "name": "Python notebook model",
+ "source": "python notebook/notebook.ipynb -> music_genre_model.joblib (exported exactly)",
+ "inputs": [
+  "Anxiety",
+  "Depression",
+  "Insomnia",
+  "OCD"
+ ],
+ "mean": [
+  5.837636,
+  4.796196,
+  3.738451,
+  2.637228
+ ],
+ "scale": [
+  2.791156,
+  3.026812,
+  3.08659,
+  2.840086
+ ],
+ "clusters": [
+  {
+   "label": "EDM",
+   "members": [
+    "EDM"
+   ],
+   "coef": [
+    -0.03701,
+    0.25194,
+    0.04786,
+    0.14889
+   ],
+   "intercept": 0.34288,
+   "prevalence": 0.5829
+  },
+  {
+   "label": "Lofi",
+   "members": [
+    "Lofi"
+   ],
+   "coef": [
+    0.09633,
+    0.07593,
+    0.02933,
+    0.04299
+   ],
+   "intercept": 0.49156,
+   "prevalence": 0.6196
+  },
+  {
+   "label": "Video game music",
+   "members": [
+    "Video game music"
+   ],
+   "coef": [
+    0.06659,
+    0.15746,
+    0.00925,
+    -0.0087
+   ],
+   "intercept": 0.75806,
+   "prevalence": 0.6793
+  },
+  {
+   "label": "K pop",
+   "members": [
+    "K pop"
+   ],
+   "coef": [
+    0.08355,
+    0.01114,
+    -0.0175,
+    0.00504
+   ],
+   "intercept": -0.26286,
+   "prevalence": 0.4348
+  },
+  {
+   "label": "Latin",
+   "members": [
+    "Latin"
+   ],
+   "coef": [
+    -0.17238,
+    0.11394,
+    0.14613,
+    -0.06782
+   ],
+   "intercept": -0.41818,
+   "prevalence": 0.3981
+  },
+  {
+   "label": "Hip hop, R&B & Rap",
+   "members": [
+    "Hip hop",
+    "R&B",
+    "Rap"
+   ],
+   "coef": [
+    -0.17352,
+    0.53491,
+    -0.02188,
+    0.14269
+   ],
+   "intercept": 2.06165,
+   "prevalence": 0.8777
+  },
+  {
+   "label": "Pop",
+   "members": [
+    "Pop"
+   ],
+   "coef": [
+    0.25377,
+    0.14243,
+    -0.19297,
+    0.07568
+   ],
+   "intercept": 2.55122,
+   "prevalence": 0.9239
+  },
+  {
+   "label": "Metal & Rock",
+   "members": [
+    "Metal",
+    "Rock"
+   ],
+   "coef": [
+    -0.33703,
+    0.65257,
+    0.14483,
+    -0.10372
+   ],
+   "intercept": 2.23268,
+   "prevalence": 0.8899
+  },
+  {
+   "label": "Classical",
+   "members": [
+    "Classical"
+   ],
+   "coef": [
+    -0.10225,
+    -0.02006,
+    0.10927,
+    0.05725
+   ],
+   "intercept": 1.21526,
+   "prevalence": 0.7704
+  },
+  {
+   "label": "Jazz",
+   "members": [
+    "Jazz"
+   ],
+   "coef": [
+    -0.05925,
+    0.08099,
+    0.02471,
+    -0.05192
+   ],
+   "intercept": 0.60008,
+   "prevalence": 0.6454
+  },
+  {
+   "label": "Country",
+   "members": [
+    "Country"
+   ],
+   "coef": [
+    0.05835,
+    -0.07,
+    -0.04276,
+    0.14446
+   ],
+   "intercept": 0.13724,
+   "prevalence": 0.534
+  },
+  {
+   "label": "Folk",
+   "members": [
+    "Folk"
+   ],
+   "coef": [
+    0.15667,
+    0.11153,
+    0.03456,
+    0.01043
+   ],
+   "intercept": 0.42546,
+   "prevalence": 0.6033
+  },
+  {
+   "label": "Gospel",
+   "members": [
+    "Gospel"
+   ],
+   "coef": [
+    -0.11252,
+    0.02326,
+    0.04765,
+    0.11473
+   ],
+   "intercept": -0.98301,
+   "prevalence": 0.2731
+  }
+ ],
+ "reported": {
+  "macroAuc": 0.519,
+  "baselineAuc": 0.453,
+  "permutationP": "< 0.001",
+  "bestClusterAuc": 0.631,
+  "brier": 0.197
+ }
+}

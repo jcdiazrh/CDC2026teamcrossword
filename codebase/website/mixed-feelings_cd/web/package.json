@@ -10,6 +10,7 @@
     "check": "node scripts/check.mjs",
     "data": "python3 scripts/build_data.py",
     "model": "python3 scripts/build_r_model.py",
+    "feelings-models": "python3 scripts/build_feelings_models.py",
     "preview": "vite preview"
   },
   "dependencies": {
