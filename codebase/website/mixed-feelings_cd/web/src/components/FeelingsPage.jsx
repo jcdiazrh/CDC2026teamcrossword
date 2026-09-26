@@ -3,7 +3,7 @@ import { Radar } from 'react-chartjs-2'
 import survey from '../data/survey.json'
 import truman from '../data/truman_model.json'
 import pyModel from '../data/python_model.json'
-import { trumanPredict, pythonPredict } from '../model/feelingsModels.js'
+import { trumanPredict, pythonPredict, trumanSignificant } from '../model/feelingsModels.js'
 import { CD, radarOptions, wrapLabel } from './charts.js'
 
 const FEELINGS = [
@@ -180,10 +180,18 @@ export default function FeelingsPage() {
         <div className="model-note">
           {which === 'truman' ? (
             <>
-              <b>How good is it?</b> On the held-out {truman.test.n} survey responses it picked the right favorite
-              {' '}{pct(truman.test.accuracy)}% of the time, versus {pct(truman.test.majorityAccuracy)}% for always
-              guessing {truman.test.majorityClass}. As Truman noted, feelings alone barely predict a favorite genre.
-              <span className="model-src">{truman.source}. Rock+Metal, Pop+K pop and Hip hop+Rap are merged, as in the .qmd.</span>
+              <b>What the model says.</b> {truman.formula}, a multinomial logistic regression. Effects with p &lt; 0.05,
+              compared with the model's reference genre ({truman.reference}):
+              <ul className="sig-list">
+                {trumanSignificant(truman).map((t) => (
+                  <li key={t.level + t.term}>
+                    <b>{t.term}</b> {t.estimate > 0 ? '↑' : '↓'} <b>{t.level}</b> as a favorite:
+                    odds ×{Math.exp(t.estimate).toFixed(2)} per {t.term === 'Age' ? 'year' : 'point'} <span>(p = {t.p.toFixed(3)})</span>
+                  </li>
+                ))}
+              </ul>
+              Everything else in the model wasn't significant, so most of what you see is the survey's overall favorites.
+              <span className="model-src">{truman.source}. Fit on {truman.n} survey responses; Rock+Metal, Pop+K pop and Hip hop+Rap merged.</span>
             </>
           ) : (
             <>

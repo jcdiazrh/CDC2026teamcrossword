@@ -37,4 +37,6 @@ for (const [label, sc] of [['calm', { Anxiety: 1, Depression: 1, Insomnia: 1, OC
   console.log(`  truman: pick ${t.pick.id} ${(t.pick.p * 100).toFixed(1)}% (${t.pick.lift.toFixed(2)}x), most likely ${t.mostLikely.id} ${(t.mostLikely.p * 100).toFixed(1)}%`)
   console.log(`  python: pick ${py.pick.id} ${(py.pick.p * 100).toFixed(1)}% (${py.pick.lift.toFixed(2)}x), probs ${py.items.map((i) => `${i.id} ${(i.p * 100).toFixed(0)}`).join(', ')}`)
 }
+const { trumanSignificant } = await import('../src/model/feelingsModels.js')
+console.log('\ntruman significant:', trumanSignificant(truman).map((t) => `${t.level}~${t.term} ${t.estimate}`).join('; '))
 console.log('\nbaseline', survey.means, '\nOK')
