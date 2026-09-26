@@ -5,9 +5,11 @@ import { makeTitle } from '../src/lib/title.js'
 import { mockListening } from '../src/dev/mockListening.js'
 import { knnPredict } from '../src/model/knn.js'
 import { linearPredict } from '../src/model/linear.js'
-import { feelingsToMusic } from '../src/model/reverse.js'
+import { trumanPredict, pythonPredict } from '../src/model/feelingsModels.js'
 
 const survey = JSON.parse(readFileSync(new URL('../src/data/survey.json', import.meta.url)))
+const truman = JSON.parse(readFileSync(new URL('../src/data/truman_model.json', import.meta.url)))
+const pyModel = JSON.parse(readFileSync(new URL('../src/data/python_model.json', import.meta.url)))
 const linear = JSON.parse(readFileSync(new URL('../src/data/r_model.json', import.meta.url)))
 const r1 = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, +v.toFixed(2)]))
 
@@ -27,9 +29,12 @@ for (const kind of ['metal', 'pop', 'mixed']) {
   if (Math.abs(sum - 1) > 1e-9) throw new Error('shares must sum to 1')
 }
 for (const [label, sc] of [['calm', { Anxiety: 1, Depression: 1, Insomnia: 1, OCD: 0 }], ['struggling', { Anxiety: 9, Depression: 9, Insomnia: 8, OCD: 6 }]]) {
-  const r = feelingsToMusic(sc, survey, { k: 60 })
-  console.log(`\n== feelings→music (${label}): pick ${r.pick} ${Math.round(r.pct[r.pick] * 100)}% (${r.lift[r.pick].toFixed(2)}x) distinctive ${r.distinctive.join(', ')} fav ${r.favTop.map((f) => `${f.group} ${Math.round(f.share * 100)}%`).join(', ')}`)
-  const s = Object.values(r.pct).every((v) => v >= 0 && v <= 1)
-  if (!s) throw new Error('pct out of range')
+  const t = trumanPredict(truman, { scores: sc, age: 21, service: 'Spotify' })
+  const py = pythonPredict(pyModel, { scores: sc })
+  const sum = t.items.reduce((a, b) => a + b.p, 0)
+  if (Math.abs(sum - 1) > 1e-6) throw new Error('truman probs must sum to 1')
+  console.log(`\n== feelings→music (${label})`)
+  console.log(`  truman: pick ${t.pick.id} ${(t.pick.p * 100).toFixed(1)}% (${t.pick.lift.toFixed(2)}x), most likely ${t.mostLikely.id} ${(t.mostLikely.p * 100).toFixed(1)}%`)
+  console.log(`  python: pick ${py.pick.id} ${(py.pick.p * 100).toFixed(1)}% (${py.pick.lift.toFixed(2)}x), probs ${py.items.map((i) => `${i.id} ${(i.p * 100).toFixed(0)}`).join(', ')}`)
 }
 console.log('\nbaseline', survey.means, '\nOK')
