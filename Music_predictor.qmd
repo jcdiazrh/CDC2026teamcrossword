@@ -1,0 +1,196 @@
+---
+title: "CDC2026"
+author: "teamcrossword"
+format: html
+editor: visual
+---
+
+## Loading Data
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(tidymodels)
+library(knitr)
+library(car)
+library(nnet)
+library(yardstick)
+library(pROC)
+library(forcats)
+
+
+#Loading csv
+DepMus <- read.csv("C:/Users/Truman/Downloads/CDC2026 - Dep-_Mus_mxmh_survey_results.csv")
+
+#Setting as factor so model can predict
+DepMus$Fav.genre <- as.factor(DepMus$Fav.genre)
+
+#setting training vs. testing data
+set.seed(101)
+sample_index <- sample(1:nrow(DepMus), size = floor(.85*nrow(DepMus)))
+
+train_DepMus <- DepMus[sample_index,]
+test_DepMus <- DepMus[-sample_index,]
+
+```
+
+## Initial Model
+
+```{r}
+#Fitting model with all variables
+
+fit_DepMus <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service+Hours.per.day+Exploratory+Foreign.languages+Music.effects, train_DepMus)
+
+tidy(fit_DepMus)|>
+  kable(digits = 3)
+
+```
+
+## VIF Checking
+
+```{r}
+#have to use work around with multinom output not working, so using random model to compute VIF
+
+aux_model<-lm(1:nrow(DepMus)~Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service+Hours.per.day+Exploratory+Foreign.languages+Music.effects, DepMus)
+
+vif(aux_model)
+```
+
+No Predict shows significant signs of collinearity
+
+## Confusion Matrix of Initial Model
+
+```{r}
+#Making prediction column
+test_DepMus$predict <- predict(fit_DepMus, newdata = test_DepMus)
+
+confDepMus <- conf_mat(data= test_DepMus, truth=Fav.genre, estimate=predict)
+
+autoplot(confDepMus, type="heatmap")
+
+
+```
+
+That's chopped, we're going to need to combine outputs.
+
+## Combine
+
+```{r}
+#going to combine K-pop and Pop, Metal and Rock, Rap and Hip-Hop
+
+mutDepMus <- DepMus |> 
+                  mutate(Fav.genre = fct_collapse(Fav.genre, "Rock" = c("Rock", "Metal"), "Pop"=c("Pop","K pop"), "Hip hop" = c("Rap", "Hip hop")))
+
+
+```
+
+## New Confusion Matrix
+
+```{r}
+
+
+tidy(fit_mutDepMus)|>
+  kable(digits = 3)
+
+#Fixing Test Data and prediction
+
+mut_train_DepMus <- mutDepMus[sample_index,]
+mut_test_DepMus <- mutDepMus[-sample_index,]
+
+#New Model
+fit_mutDepMus <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service+Hours.per.day+Exploratory+Foreign.languages+Music.effects, mut_train_DepMus)
+
+tidy(fit_mutDepMus)|>
+  kable(digits = 3)
+
+
+#Adding Prediction Var
+mut_test_DepMus$predict <- predict(fit_mutDepMus, newdata = mut_test_DepMus)
+
+#Confusion Matrix
+
+confDepMus <- conf_mat(data= mut_test_DepMus, truth=Fav.genre, estimate=predict)
+
+autoplot(confDepMus, type="heatmap")
+
+
+```
+
+```{r}
+pred_obj <- predict(fit_mutDepMus,newdata = mut_test_DepMus[1,], type = "probs")
+
+tidy(pred_obj) |>
+  kable(digits=3)
+```
+
+Ok, pivoting towards finding what vars we can remove and then reweighting
+
+Comparing BIC of just the 4 OCD, Anxiety, Depression, Insomnia and then adding vars
+
+```{r}
+fit_mutDepMus1 <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD, mut_train_DepMus)
+
+fit_mutDepMus2 <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service, mut_train_DepMus)
+
+fit_mutDepMus3 <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service+Hours.per.day, mut_train_DepMus)
+
+fit_mutDepMus4 <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service+Hours.per.day+Exploratory, mut_train_DepMus)
+
+
+AIC(fit_mutDepMus, fit_mutDepMus1, fit_mutDepMus2, fit_mutDepMus3, fit_mutDepMus4)
+
+
+```
+
+Hmm, they're basically all similar, but what if I re-weight?
+
+```{r}
+#thanks claude
+
+class_counts <- table(mut_train_DepMus$Fav.genre)
+inv_freq <- 1 / class_counts  # base weights, higher for rarer classes
+
+strengths <- c(0, 0.5, 1, 1.5, 2)  # 0 = no reweighting, higher = more aggressive
+results <- data.frame(strength = strengths, brier = NA)
+
+for (i in seq_along(strengths)) {
+  s <- strengths[i]
+  
+  w_lookup <- inv_freq^s
+  w_lookup <- w_lookup / mean(w_lookup)  # normalize so weights average to 1
+  
+  mut_train_DepMus$w <- w_lookup[mut_train_DepMus$Fav.genre]
+  
+  model <- multinom(Fav.genre ~ Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service, data = mut_train_DepMus, weights = mut_test_DepMus$w, trace = FALSE)
+  probs <- predict(model, newdata = mut_test_DepMus, type = "probs")
+  
+  y_matrix <- model.matrix(~ Fav.genre - 1, data = mut_test_DepMus)
+  colnames(y_matrix) <- levels(mut_test_DepMus$Fav.genre)
+  y_matrix <- y_matrix[, colnames(probs)]
+  
+  results$brier[i] <- mean(rowSums((probs - y_matrix)^2))
+}
+
+results
+best_strength <- results$strength[which.min(results$brier)]
+best_strength
+
+table(mut_train_DepMus$Fav.genre, mut_train_DepMus$w)
+```
+
+```{r}
+table(mut_train_DepMus$Fav.genre, mut_train_DepMus$w) |> kable(digits=2)
+```
+
+Screw it here's our model:
+
+## Model
+
+```{r}
+fit_mutDepMus2|>
+  tidy()|>  
+    select(y.level, term, estimate, p.value) |>
+      kable(digits=3)
+```
