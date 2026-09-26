@@ -1,0 +1,12 @@
+I ran four linear models using R: one to predict anxiety, one to predict depression, one to predict insomnia, and one to predict OCD. Each model used the sixteen genres in the data as a predictor. Never or rarely were coded as 0 and sometimes or very frequently were coded as 1.
+
+For each mental health issue, I left the outcome as continuous since the self-reported scores were on a scale of 0 to 10.
+
+No predictor had a VIF score of greater than 2.03 indicating no multicollinearity.
+
+Across the 64 coefficients (four models times sixteen genres are predictors), three were significant at the alpha=0.05 level:
+Country music listeners on average reported a depression score 0.72 lower than non-country listeners.
+Rock listeners on average reported a depression score 0.92 higher than non-rock listeners.
+Metal listeners on average reported an insomnia score 1.02 higher than non-metal listeners.
+
+Care should be taken though, because of the multiple comparisons problem--with 64 p-values it is likely some will be significant by random chance.
