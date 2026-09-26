@@ -10,6 +10,14 @@ Log in with Spotify, and the app reads your top 50 artists and gives you:
 
 <p><img src="docs/landing.png" width="260"> <img src="docs/results.png" width="260"></p>
 
+**Two directions** (slide switch at the top of every page):
+- **Music → Feelings** (light): the Spotify flow below
+- **Feelings → Music** (dark, no login needed): slide your anxiety, depression, insomnia, and OCD (0–10) and the app
+  guesses your music taste from the 60 survey respondents whose scores are closest to yours. `#feelings` in the URL opens it directly.
+
+The genre charts use **13 categories**: the survey's 16 with Hip hop + Rap, Pop + K pop, and Rock + Metal merged
+(`src/lib/groups.js`). The models still use all 16 underneath.
+
 Built for CDC UNC 2026. React + Vite + Chart.js, 100% in the browser (no server).
 
 ---
@@ -81,6 +89,8 @@ Anxiety / Depression / Insomnia / OCD (0–10) → second radar
 | `src/lib/title.js` | Adjective (from genre #2 or how varied you are) + noun (from genre #1). Never uses the mental-health results. |
 | `src/model/index.js` | **Model registry**: `ACTIVE_MODEL = 'team'` |
 | `src/model/linear.js` | The team regression (binary genre coding), significant effects, fit notes |
+| `src/model/reverse.js` | Feelings → Music: nearest survey respondents by the 4 scores → what share of them listen to each group vs everyone |
+| `src/lib/groups.js` | The 13 display groups (merged pairs) |
 | `src/model/knn.js` | Alternative "listeners like you" model (switchable in *Under the hood*) |
 | `scripts/build_r_model.py` | Builds `src/data/r_model.json`, from `r_coefficients.csv` if present, else refits the same model in Python |
 | `scripts/build_data.py` | CSV → `src/data/survey.json` |

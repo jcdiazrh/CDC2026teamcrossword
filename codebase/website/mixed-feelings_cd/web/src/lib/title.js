@@ -1,3 +1,5 @@
+import { leadMember } from './groups.js'
+
 // "Moody Metalhead"-style titles. The noun comes from your #1 genre; the adjective
 // from your #2 genre or how varied your taste is. Never from the mental-health results.
 
@@ -54,12 +56,16 @@ function rng(seedStr) {
 const pick = (arr, rand) => arr[Math.floor(rand() * arr.length)]
 
 export function makeTitle(profile, seed = '') {
-  const [first, second] = profile.ranked
-  if (!first) return { adjective: 'Mysterious', noun: 'Listener' }
+  // Rank by the 13 display groups (so the title matches the genre chart), then use
+  // the bigger member for flavour: "Rock & Metal" with more Metal -> Metalhead
+  const [g1, g2] = profile.groupRanked
+  if (!g1) return { adjective: 'Mysterious', noun: 'Listener' }
+  const first = leadMember(g1, profile.shares)
+  const second = g2 ? leadMember(g2, profile.shares) : null
   const rand = rng(seed + first + (second || ''))
   let pool = second ? [...ADJECTIVES[second]] : []
-  if (profile.variety > 0.62) pool = pool.concat(WIDE, WIDE)
-  if (profile.shares[first] > 0.55 || !second) pool = pool.concat(NARROW, NARROW)
+  if (profile.groupVariety > 0.62) pool = pool.concat(WIDE, WIDE)
+  if (profile.groupShares[g1] > 0.55 || !second) pool = pool.concat(NARROW, NARROW)
   if (!pool.length) pool = ADJECTIVES[first]
   return { adjective: pick(pool, rand), noun: pick(NOUNS[first], rand) }
 }

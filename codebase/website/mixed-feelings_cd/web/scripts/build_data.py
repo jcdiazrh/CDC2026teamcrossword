@@ -5,13 +5,12 @@ Turn the survey CSV into the small JSON files the web app reads.
 
 Writes:
   src/data/survey.json   - every respondent's 16 genre frequencies (0-3),
-                           4 mental-health scores (0-10) and music effect
+                           4 mental-health scores (0-10), music effect and favorite genre
 (The team's regression model is built separately by scripts/build_r_model.py.)
 """
 import json
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,14 +33,16 @@ eff = df["Music effects"].map(EFFECT)
 rows = []
 for i in range(len(df)):
     e = eff.iloc[i]
-    rows.append(X[i].tolist() + [round(v, 1) for v in Y[i]] + [None if pd.isna(e) else int(e)])
+    fav = df["Fav genre"].iloc[i]
+    rows.append(X[i].tolist() + [round(v, 1) for v in Y[i]] + [None if pd.isna(e) else int(e)]
+                + [genres.index(fav) if fav in genres else None])
 
 survey = {
     "source": "MxMH survey (mxmh_survey_results.csv)",
     "n": len(rows),
     "genres": genres,
     "conditions": CONDITIONS,
-    "columns": genres + CONDITIONS + ["MusicEffect"],
+    "columns": genres + CONDITIONS + ["MusicEffect", "FavGenre"],  # FavGenre = index into genres
     "means": {c: round(float(df[c].mean()), 2) for c in CONDITIONS},
     "improveShare": round(float((eff == 1).sum() / eff.notna().sum()), 3),
     "rows": rows,

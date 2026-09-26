@@ -5,6 +5,8 @@ import { enrichGenres } from './lib/genreSources.js'
 import Landing from './components/Landing.jsx'
 import Loading from './components/Loading.jsx'
 import Results from './components/Results.jsx'
+import ModeSwitch from './components/ModeSwitch.jsx'
+import FeelingsPage from './components/FeelingsPage.jsx'
 
 // DEV ONLY: ?mock=metal|pop|mixed skips Spotify (see src/dev/mockListening.js)
 const mockKind = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('mock') : null
@@ -15,6 +17,14 @@ export default function App() {
   const [timeRange, setTimeRange] = useState('medium_term')
   const [listening, setListening] = useState(null)
   const [loadingMsg, setLoadingMsg] = useState(null)
+  // 'music' = Spotify → feelings (light), 'feelings' = your scores → music (dark). #feelings in the URL opens it directly
+  const [mode, setMode] = useState(() => (window.location.hash === '#feelings' ? 'feelings' : 'music'))
+
+  useEffect(() => {
+    document.body.classList.toggle('dark', mode === 'feelings')
+    window.history.replaceState({}, '', mode === 'feelings' ? '#feelings' : window.location.pathname + window.location.search)
+    window.scrollTo({ top: 0 })
+  }, [mode])
 
   const load = useCallback(async (range) => {
     setPhase('loading')
@@ -72,8 +82,10 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${mode === 'feelings' ? 'dark' : ''}`}>
       <div className="grain" aria-hidden="true" />
+      {!(mode === 'music' && phase === 'loading') && <ModeSwitch mode={mode} onChange={setMode} />}
+      {mode === 'feelings' ? <FeelingsPage /> : <>
       {phase === 'boot' && null}
       {phase === 'landing' && <Landing error={error} onLogin={spotify.login} ready={spotify.hasClientId()} />}
       {phase === 'loading' && <Loading message={loadingMsg} />}
@@ -87,6 +99,7 @@ export default function App() {
           onLogout={logout}
         />
       )}
+      </>}
     </div>
   )
 }

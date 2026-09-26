@@ -6,10 +6,14 @@ Depression / Insomnia / OCD). The web app lives in `codebase/website/mixed-feeli
 
 ## What the app does
 Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 months default** / all time) →
-1. Radar of your top 5 genres, using the survey's 16 broad genres (not Spotify micro-genres)
+1. Radar of your top 5 genres (toggle: all 13). **13 display groups** = the survey's 16 with Hip hop+Rap, Pop+K pop, Rock+Metal merged (`web/src/lib/groups.js`); models still use all 16
 2. A fun title ("Moody Metalhead"): noun from genre #1, adjective from genre #2 or taste variety, with a dice reroll
 3. Radar of the 4 mental-health scores reported by survey respondents with similar genre habits,
    overlaid on the whole-survey average, plus a "% say music improves their mental health" callout
+
+4. **Feelings → Music** (dark mode, slide switch at the top, no login): user sets the 4 scores → `web/src/model/reverse.js`
+   finds the 60 nearest respondents by those scores → share who listen (Sometimes+) to each of the 13 groups vs everyone,
+   the most over-represented group as the "predicted soundtrack", and their favorite genres
 
 ## Decisions already agreed with the team (don't undo without asking)
 - Stack: React + Vite + Chart.js, browser-only Spotify PKCE login (no server, no client secret)
