@@ -1,0 +1,92 @@
+---
+title: "CDC 2026"
+author: "Ari Staggs"
+date: "Sep 26, 2026"
+---
+
+## Packages
+
+```{r}
+#| label: load-packages
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(knitr)
+library(tidymodels)
+library(rms) #calculate VIF
+library(car)
+```
+
+## Load Data
+
+```{r}
+#| label: load-data
+#| message: false
+
+music <- read_csv("C:/Users/Ari/Downloads/music.csv")
+```
+
+## Create Training and Test Data
+```{r}
+set.seed(101)
+sample_index <- sample(1:nrow(music), size = floor(0.85*nrow(music)))
+
+train_music <- music[sample_index,]
+test_music <- music[-sample_index,]
+```
+
+
+## Create Models
+
+```{r}
+#| label: Music -> Mental Health
+
+anxiety_model <- lm(anxiety~classical+country+edm+folk+gospel+hiphop+jazz+kpop+latin+lofi+metal+pop+rnb+rap+rock+vgm, data=train_music)
+
+depression_model <- lm(depression~classical+country+edm+folk+gospel+hiphop+jazz+kpop+latin+lofi+metal+pop+rnb+rap+rock+vgm, data=train_music)
+
+insomnia_model <- lm(insomnia~classical+country+edm+folk+gospel+hiphop+jazz+kpop+latin+lofi+metal+pop+rnb+rap+rock+vgm, data=train_music)
+
+ocd_model <- lm(ocd~classical+country+edm+folk+gospel+hiphop+jazz+kpop+latin+lofi+metal+pop+rnb+rap+rock+vgm, data=train_music)
+
+tidy(anxiety_model)
+tidy(depression_model)
+tidy(insomnia_model)
+tidy(ocd_model)
+
+```
+
+## Check for Multicollinearity
+
+```{r}
+vif(anxiety_model)
+
+```
+## Predict Values for Test Data
+
+```{r}
+anxiety_pred <- predict(anxiety_model, newdata = test_music)
+depression_pred <- predict(depression_model, newdata = test_music)
+insomnia_pred <- predict(insomnia_model, newdata = test_music)
+ocd_pred <- predict(ocd_model, newdata = test_music)
+
+test_music <- test_music |> mutate(anxiety_pred=anxiety_pred,depression_pred=depression_pred,insomnia_pred=insomnia_pred,ocd_pred=ocd_pred)
+
+```
+## Assess Fit
+```{r}
+sqrt(mean((test_music$anxiety_pred-test_music$anxiety)^2))
+sd(test_music$anxiety)
+
+sqrt(mean((test_music$depression_pred-test_music$depression)^2))
+sd(test_music$depression)
+
+sqrt(mean((test_music$insomnia_pred-test_music$insomnia)^2))
+sd(test_music$insomnia)
+
+sqrt(mean((test_music$ocd_pred-test_music$ocd)^2))
+sd(test_music$ocd)
+
+```
+
