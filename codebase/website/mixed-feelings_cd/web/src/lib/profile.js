@@ -2,6 +2,7 @@
 // survey genres. That's the same "language" as the survey rows, so the two
 // can be compared.
 import { SURVEY_GENRES, mapArtist } from './genreMap.js'
+import { GROUPS, GROUP_IDS, sumByGroup } from './groups.js'
 
 /**
  * @param {{artists: {id,name,genres}[], tracks: {artistIds: string[]}[]}} listening
@@ -48,7 +49,18 @@ export function buildProfile(listening) {
   const ranked = SURVEY_GENRES.filter((g) => shares[g] > 0).sort((a, b) => shares[b] - shares[a])
   const entropy = -Object.values(shares).filter((s) => s > 0).reduce((s, p) => s + p * Math.log(p), 0)
 
+  // The 13 display groups (Hip hop+Rap, Pop+K pop, Rock+Metal merged) used by the genre charts and title
+  const groupShares = sumByGroup(shares)
+  const groupRanked = GROUP_IDS.filter((g) => groupShares[g] > 0).sort((a, b) => groupShares[b] - groupShares[a])
+  const artistsByGroup = Object.fromEntries(GROUPS.map((g) => [g.id, [...new Set(g.members.flatMap((m) => artistsByGenre[m]))]]))
+  const gEntropy = -Object.values(groupShares).filter((s) => s > 0).reduce((s, p) => s + p * Math.log(p), 0)
+
   return {
+    groupShares,
+    groupRanked,
+    groupTop5: groupRanked.slice(0, 5),
+    artistsByGroup,
+    groupVariety: gEntropy / Math.log(GROUP_IDS.length),
     shares,
     levels,
     ranked,

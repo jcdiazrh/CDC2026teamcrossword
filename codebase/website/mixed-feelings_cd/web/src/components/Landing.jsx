@@ -32,7 +32,7 @@ export default function Landing({ onLogin, error, ready }) {
 
       <ol className="steps">
         <li><b>1</b> Log in</li>
-        <li><b>2</b> We sort 50 artists into 16 genres</li>
+        <li><b>2</b> We sort 50 artists into 13 genres</li>
         <li><b>3</b> Meet your vibe</li>
       </ol>
 
