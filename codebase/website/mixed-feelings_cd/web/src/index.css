@@ -237,3 +237,10 @@ code { font-size: .9em; background: rgba(30, 22, 49, .07); padding: 1px 6px; bor
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* genre card header with the Top 5 / All 16 toggle */
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.range.toggle { flex: none; margin-top: 2px; }
+.range.toggle button { padding: 6px 12px; font-size: 13px; white-space: nowrap; }
+.chart-box-all { height: 380px; }
+.chip.zero { opacity: .5; }

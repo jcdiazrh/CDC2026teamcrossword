@@ -1,4 +1,4 @@
-# Builds the web app in /web and publishes it to GitHub Pages on every push to main.
+# Builds the web app in /codebase/website/mixed-feelings_cd/web and publishes it to GitHub Pages on every push to main.
 # One-time setup: Settings -> Pages -> Source: "GitHub Actions"
 #                 Settings -> Secrets and variables -> Actions -> Variables -> SPOTIFY_CLIENT_ID and LASTFM_API_KEY
 name: Deploy web app
@@ -6,7 +6,7 @@ name: Deploy web app
 on:
   push:
     branches: [main]
-    paths: ['web/**', '.github/workflows/deploy-web.yml']
+    paths: ['codebase/website/mixed-feelings_cd/web/**', '.github/workflows/deploy-web.yml']
   workflow_dispatch:
 
 permissions:
@@ -23,14 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: web
+        working-directory: codebase/website/mixed-feelings_cd/web
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: codebase/website/mixed-feelings_cd/web/package-lock.json
       - run: npm ci
       - run: node scripts/check.mjs
       - run: npm run build
@@ -40,7 +40,7 @@ jobs:
           VITE_LASTFM_API_KEY: ${{ vars.LASTFM_API_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: web/dist
+          path: codebase/website/mixed-feelings_cd/web/dist
 
   deploy:
     needs: build

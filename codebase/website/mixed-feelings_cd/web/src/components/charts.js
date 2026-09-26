@@ -17,7 +17,7 @@ export const C = {
 const FONT = "'DM Sans Variable', system-ui, sans-serif"
 const DISPLAY = "'Bricolage Grotesque Variable', 'DM Sans Variable', system-ui, sans-serif"
 
-export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle = 0, showTicks = true }) {
+export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle = 0, showTicks = true, labelSize = 13, pointRadius = 5 }) {
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -32,7 +32,7 @@ export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle
         ticks: { stepSize: step, display: showTicks, backdropColor: 'transparent', color: C.ink2, font: { family: FONT, size: 10 }, z: 1 },
         grid: { color: C.grid, lineWidth: 1.5 },
         angleLines: { color: C.grid, lineWidth: 1.5 },
-        pointLabels: { color: C.ink, font: { family: DISPLAY, size: 13, weight: 700 }, padding: 8 },
+        pointLabels: { color: C.ink, font: { family: DISPLAY, size: labelSize, weight: 700 }, padding: labelSize < 13 ? 5 : 8 },
       },
     },
     plugins: {
@@ -50,7 +50,7 @@ export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle
     },
     elements: {
       line: { borderWidth: 2.5, tension: 0.08 },
-      point: { radius: 5, hoverRadius: 8, hitRadius: 18, borderWidth: 2, backgroundColor: '#fff' },
+      point: { radius: pointRadius, hoverRadius: 8, hitRadius: 18, borderWidth: 2, backgroundColor: '#fff' },
     },
   }
 }

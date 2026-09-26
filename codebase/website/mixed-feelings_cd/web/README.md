@@ -36,7 +36,7 @@ Without a key the app falls back to MusicBrainz, which is slow (1 lookup per sec
 
 ### 3. Start the app
 ```bash
-cd web
+cd codebase/website/mixed-feelings_cd/web
 cp .env.example .env.local        # paste the Spotify Client ID + Last.fm key into it
 npm install
 npm run dev                       # opens http://127.0.0.1:5173/
@@ -46,7 +46,7 @@ npm run dev                       # opens http://127.0.0.1:5173/
 `http://127.0.0.1:5173/?mock=metal` (or `?mock=pop`, `?mock=mixed`, or `?mock=nogenres` to simulate Spotify sending no genres). This is stripped out of the production build.
 
 ## Deploy (GitHub Pages)
-The workflow `.github/workflows/deploy-web.yml` builds and publishes on every push to `main`.
+The workflow `.github/workflows/deploy-web.yml` (at the repo root) builds and publishes on every push to `main`.
 One-time setup in the repo:
 - **Settings → Pages → Source:** GitHub Actions
 - **Settings → Secrets and variables → Actions → Variables:** add `SPOTIFY_CLIENT_ID` and `LASTFM_API_KEY`
