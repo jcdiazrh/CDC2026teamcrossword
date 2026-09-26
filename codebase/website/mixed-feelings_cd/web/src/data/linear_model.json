@@ -1,0 +1,108 @@
+{
+  "type": "linear",
+  "description": "Sample ridge regression (lambda=10) on 16 genre frequencies (0-3). Replace with your team's model.",
+  "features": [
+    "Classical",
+    "Country",
+    "EDM",
+    "Folk",
+    "Gospel",
+    "Hip hop",
+    "Jazz",
+    "K pop",
+    "Latin",
+    "Lofi",
+    "Metal",
+    "Pop",
+    "R&B",
+    "Rap",
+    "Rock",
+    "Video game music"
+  ],
+  "conditions": {
+    "Anxiety": {
+      "intercept": 4.8401,
+      "coef": {
+        "Classical": -0.1542,
+        "Country": -0.1078,
+        "EDM": -0.0273,
+        "Folk": 0.2604,
+        "Gospel": -0.1355,
+        "Hip hop": -0.1358,
+        "Jazz": -0.0081,
+        "K pop": 0.0623,
+        "Latin": -0.0869,
+        "Lofi": 0.0738,
+        "Metal": 0.0765,
+        "Pop": 0.2738,
+        "R&B": 0.0043,
+        "Rap": 0.1496,
+        "Rock": 0.0553,
+        "Video game music": 0.2103
+      }
+    },
+    "Depression": {
+      "intercept": 2.7803,
+      "coef": {
+        "Classical": 0.0198,
+        "Country": -0.351,
+        "EDM": 0.1155,
+        "Folk": 0.2316,
+        "Gospel": -0.0383,
+        "Hip hop": 0.0523,
+        "Jazz": 0.036,
+        "K pop": -0.0962,
+        "Latin": 0.048,
+        "Lofi": -0.1061,
+        "Metal": 0.2812,
+        "Pop": 0.1983,
+        "R&B": 0.0398,
+        "Rap": 0.2776,
+        "Rock": 0.3168,
+        "Video game music": 0.129
+      }
+    },
+    "Insomnia": {
+      "intercept": 2.6494,
+      "coef": {
+        "Classical": 0.2483,
+        "Country": -0.2476,
+        "EDM": 0.168,
+        "Folk": 0.027,
+        "Gospel": 0.0277,
+        "Hip hop": -0.0689,
+        "Jazz": -0.0573,
+        "K pop": -0.0147,
+        "Latin": 0.1705,
+        "Lofi": 0.1033,
+        "Metal": 0.3998,
+        "Pop": -0.1109,
+        "R&B": 0.0664,
+        "Rap": 0.0982,
+        "Rock": 0.0651,
+        "Video game music": 0.0713
+      }
+    },
+    "OCD": {
+      "intercept": 2.1309,
+      "coef": {
+        "Classical": 0.0384,
+        "Country": 0.1917,
+        "EDM": 0.2406,
+        "Folk": 0.041,
+        "Gospel": -0.0055,
+        "Hip hop": 0.0384,
+        "Jazz": -0.1553,
+        "K pop": -0.0267,
+        "Latin": -0.1484,
+        "Lofi": 0.112,
+        "Metal": 0.0252,
+        "Pop": 0.0364,
+        "R&B": 0.1389,
+        "Rap": -0.0379,
+        "Rock": -0.0669,
+        "Video game music": 0.0152
+      }
+    }
+  }
+}
