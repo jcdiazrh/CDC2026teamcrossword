@@ -2,7 +2,7 @@
 
 Hackathon project (due Sun 2026-09-27, 10am ET). The dataset is `mxmh_survey_results.csv`
 (MxMH survey: 736 respondents, 16 genre-frequency columns, self-rated 0–10 Anxiety /
-Depression / Insomnia / OCD). The web app lives in `web/`; see `web/README.md` for setup.
+Depression / Insomnia / OCD). The web app lives in `codebase/website/mixed-feelings_cd/web/` (called `web/` below); see its README for setup. The team's R linear model is in `musictomentalhealthlm.qmd` (genres coded 0 = never/rarely, 1 = sometimes/very frequently).
 
 ## What the app does
 Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 months default** / all time) →
@@ -27,9 +27,9 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
   `web/src/lib/genreSources.js` fills genres from Last.fm (`VITE_LASTFM_API_KEY`), falling back to MusicBrainz (top 15 artists, 1 request/second)
 - Redirect URIs must match exactly with a trailing slash: `http://127.0.0.1:5173/` (never `localhost`) and `https://<user>.github.io/<repo>/`
 - Env: `web/.env.local` (git-ignored) holds `VITE_SPOTIFY_CLIENT_ID` and `VITE_LASTFM_API_KEY`. Restart `npm run dev` after editing it
-- Deploy: `.github/workflows/deploy-web.yml` → GitHub Pages. Needs the repo variables `SPOTIFY_CLIENT_ID` and `LASTFM_API_KEY`
+- Deploy: `.github/workflows/deploy-web.yml` (repo root) → GitHub Pages. Needs the repo variables `SPOTIFY_CLIENT_ID` and `LASTFM_API_KEY`
 
-## Commands (run in `web/`)
+## Commands (run in `codebase/website/mixed-feelings_cd/web/`)
 - `npm run dev`: http://127.0.0.1:5173/
 - `npm run check`: runs the pipeline (genre mapping → profile → both models) on mock listeners
 - `npm run build`, `npm run lint`
