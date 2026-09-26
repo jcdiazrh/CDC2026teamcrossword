@@ -4,8 +4,9 @@ Log in with Spotify, and the app reads your top 50 artists and gives you:
 
 1. **A genre radar** of your top 5 genres, using the 16 broad genres from the MxMH survey
 2. **A title** like "Moody Metalhead" (reroll with the dice)
-3. **A "listeners like you" radar** of the anxiety, depression, insomnia, and OCD scores
-   that survey respondents with similar genre habits reported, next to the whole-survey average
+3. **A mental-health radar** from the team's regression model (Ari's R analysis): predicted anxiety,
+   depression, insomnia, and OCD scores for someone with your genre habits, next to the survey average,
+   plus which statistically significant genre effects apply to you
 
 <p><img src="docs/landing.png" width="260"> <img src="docs/results.png" width="260"></p>
 
@@ -66,8 +67,8 @@ Spotify top 50 artists
    │  src/lib/profile.js    shares → Never / Rarely / Sometimes / Very frequently (0–3)
    ▼
 same scale as the survey rows
-   │  src/model/            ← swap point for your team's model
-   ▼
+   │  src/model/linear.js   team regression: genre = 1 if Sometimes+, else 0
+   ▼                        (coefficients in src/data/r_model.json)
 Anxiety / Depression / Insomnia / OCD (0–10) → second radar
 ```
 
@@ -78,22 +79,33 @@ Anxiety / Depression / Insomnia / OCD (0–10) → second radar
 | `src/lib/genreMap.js` | Rules mapping Spotify micro-genres to the survey's 16. Each tag goes to its nearest genre, plus a neighbour at half weight when it straddles two. Unknown tags borrow the artist's other genres. |
 | `src/lib/profile.js` | Weights artists by rank (+ top-track appearances), builds the 16-genre profile |
 | `src/lib/title.js` | Adjective (from genre #2 or how varied you are) + noun (from genre #1). Never uses the mental-health results. |
-| `src/model/index.js` | **Model registry**: `ACTIVE_MODEL` picks which one runs |
-| `src/model/knn.js` | Default: average of the 50 closest survey respondents |
-| `src/model/linear.js` | Reads coefficients from `src/data/linear_model.json` |
-| `scripts/build_data.py` | CSV → `src/data/survey.json` + a sample `linear_model.json` |
+| `src/model/index.js` | **Model registry**: `ACTIVE_MODEL = 'team'` |
+| `src/model/linear.js` | The team regression (binary genre coding), significant effects, fit notes |
+| `src/model/knn.js` | Alternative "listeners like you" model (switchable in *Under the hood*) |
+| `scripts/build_r_model.py` | Builds `src/data/r_model.json`, from `r_coefficients.csv` if present, else refits the same model in Python |
+| `scripts/build_data.py` | CSV → `src/data/survey.json` |
 | `scripts/check.mjs` | Runs the whole pipeline on the mock listeners (`npm run check`) |
 
-### Plugging in a better model
-The results page has an **Under the hood** panel that shows the exact profile fed to the model, and lets you switch models live.
+### The team's model (Ari's R regression)
+The results use the model from `musictomentalhealthlm.qmd`: four linear regressions (anxiety, depression,
+insomnia, OCD) on the 16 genres, each coded **1 = Sometimes/Very frequently, 0 = Never/Rarely**.
 
-- **Linear / ridge / lasso / logistic-style:** write your coefficients into `src/data/linear_model.json`
-  (`{ conditions: { Anxiety: { intercept, coef: { Rock: 0.12, … } }, … } }`, with features on the 0–3 scale)
-  and set `ACTIVE_MODEL = 'linear'`. No other code changes.
-- **Anything else** (clusters, trees, …): add `src/model/yourModel.js` exporting
-  `predict(profile) → { scores, baseline, improveShare?, method }` and register it in `MODELS`.
-  `profile.levels` (0–3 per genre) and `profile.shares` (0–1 per genre) are available.
-- Re-generate the survey data after cleaning changes: `npm run data` (needs pandas + numpy).
+**Using Ari's exact R numbers.** Right now `r_model.json` holds the same model refit in Python on all 736
+responses (the R code reads a cleaned `music.csv` that isn't in the repo). To use the R coefficients exactly,
+run this at the end of the .qmd and commit `r_coefficients.csv` to the **repo root**:
+```r
+coefs <- bind_rows(
+  tidy(anxiety_model)    |> mutate(outcome = "Anxiety"),
+  tidy(depression_model) |> mutate(outcome = "Depression"),
+  tidy(insomnia_model)   |> mutate(outcome = "Insomnia"),
+  tidy(ocd_model)        |> mutate(outcome = "OCD")
+)
+write_csv(coefs, "r_coefficients.csv")
+```
+The deploy workflow detects the file and rebuilds the model from it. Locally: `npm run model`.
+
+**Another model entirely:** add `src/model/yourModel.js` exporting `predict(profile) → { scores, baseline, method, kind }`
+and register it in `MODELS`.
 
 ### Honest-framing rules we agreed on
 - Results are phrased as "listeners like you reported…", never "you have…"

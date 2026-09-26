@@ -26,6 +26,7 @@ export function knnPredict(profile, survey, { k = 50 } = {}) {
   }
 
   return {
+    kind: 'neighbors',
     scores: Object.fromEntries(C.map((c) => [c, sums[c] / wSum])),
     baseline: survey.means,
     improveShare: effectN ? improve / effectN : null,

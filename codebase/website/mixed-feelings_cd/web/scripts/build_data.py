@@ -4,11 +4,9 @@ Turn the survey CSV into the small JSON files the web app reads.
     python scripts/build_data.py            # uses data/mxmh_survey_results.csv
 
 Writes:
-  src/data/survey.json         - every respondent's 16 genre frequencies (0-3),
-                                 4 mental-health scores (0-10) and music effect
-  src/data/linear_model.json   - a SAMPLE ridge-regression model in the format the
-                                 app's "linear" predictor understands. Replace it
-                                 with your team's better model (same format).
+  src/data/survey.json   - every respondent's 16 genre frequencies (0-3),
+                           4 mental-health scores (0-10) and music effect
+(The team's regression model is built separately by scripts/build_r_model.py.)
 """
 import json
 from pathlib import Path
@@ -51,16 +49,4 @@ survey = {
 OUT.mkdir(parents=True, exist_ok=True)
 (OUT / "survey.json").write_text(json.dumps(survey, separators=(",", ":")))
 
-# ---- sample linear model: ridge regression, genre frequency -> score ----
-lam = 10.0
-Xc = np.column_stack([np.ones(len(X)), X])
-reg = np.eye(Xc.shape[1]) * lam
-reg[0, 0] = 0  # don't shrink the intercept
-model = {"type": "linear", "description": "Sample ridge regression (lambda=10) on 16 genre frequencies (0-3). Replace with your team's model.",
-         "features": genres, "conditions": {}}
-for j, c in enumerate(CONDITIONS):
-    beta = np.linalg.solve(Xc.T @ Xc + reg, Xc.T @ Y[:, j])
-    model["conditions"][c] = {"intercept": round(float(beta[0]), 4),
-                              "coef": {g: round(float(b), 4) for g, b in zip(genres, beta[1:])}}
-(OUT / "linear_model.json").write_text(json.dumps(model, indent=2))
 print(f"wrote {len(rows)} respondents, {len(genres)} genres")

@@ -244,3 +244,19 @@ code { font-size: .9em; background: rgba(30, 22, 49, .07); padding: 1px 6px; bor
 .range.toggle button { padding: 6px 12px; font-size: 13px; white-space: nowrap; }
 .chart-box-all { height: 380px; }
 .chip.zero { opacity: .5; }
+
+/* team model: which significant effects apply to you */
+.drivers { margin-top: 14px; border: 2px dashed var(--ink); border-radius: 18px; padding: 14px 16px; }
+.drivers-title { font-family: var(--display); font-weight: 800; font-size: 18px; margin: 0 0 2px; }
+.drivers-sub, .drivers-note { font-size: 14px; color: var(--ink-2); margin: 0 0 10px; }
+.drivers-note { margin: 10px 0 0; font-size: 13px; }
+.driver-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.driver-list li {
+  display: flex; align-items: center; gap: 8px; background: var(--cream); border: 2px solid var(--ink);
+  border-radius: 999px; padding: 6px 8px 6px 14px; font-weight: 700; font-size: 15px;
+}
+.driver-arrow { color: var(--ink-2); font-weight: 500; }
+.driver-cond { font-weight: 500; }
+.driver-eff { margin-left: auto; border-radius: 999px; padding: 2px 10px; font-variant-numeric: tabular-nums; border: 2px solid var(--ink); }
+.driver-list li.up .driver-eff { background: #FFD9CF; }
+.driver-list li.down .driver-eff { background: #CFF3E6; }
