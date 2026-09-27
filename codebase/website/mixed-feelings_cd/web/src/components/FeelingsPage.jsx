@@ -4,7 +4,7 @@ import survey from '../data/survey.json'
 import truman from '../data/truman_model.json'
 import pyModel from '../data/python_model.json'
 import { trumanPredict, pythonPredict, trumanSignificant } from '../model/feelingsModels.js'
-import { CD, radarOptions, wrapLabel } from './charts.js'
+import { radarOptions, wrapLabel } from './charts.js'
 
 const FEELINGS = [
   { id: 'Anxiety', hint: 'Worry, nervousness, feeling on edge' },
@@ -12,7 +12,16 @@ const FEELINGS = [
   { id: 'Insomnia', hint: 'Trouble falling or staying asleep' },
   { id: 'OCD', hint: 'Intrusive thoughts, urges to repeat things' },
 ]
-const SERVICE_LABEL = { 'I do not use a streaming service.': 'None', 'Other streaming service': 'Other' }
+// Platforms offered for Truman's model (values are the survey's own answers)
+const PLATFORMS = [
+  { value: 'YouTube Music', label: 'YouTube Music' },
+  { value: 'Apple Music', label: 'Apple Music' },
+  { value: 'Spotify', label: 'Spotify' },
+  { value: 'Pandora', label: 'Pandora' },
+  { value: 'Other streaming service', label: 'Other' },
+]
+const RING = '#F2553A' // the red 1× ring
+const YOU = '#8F7CFF'
 
 // The two models behind this page. "truman" is the default; the slide inside the page switches.
 const MODELS = {
@@ -20,15 +29,15 @@ const MODELS = {
     tab: "Truman's model",
     tabSub: 'Your favorite genre',
     eyebrow: "Truman's model · favorite genre",
-    you: 'Chance it’s your favorite',
-    base: 'Share of survey favorites',
+    you: 'Your multiplier (× as likely to be your favorite)',
+    unit: 'chance it’s your favorite',
   },
   python: {
     tab: 'Python model',
     tabSub: 'What you’d listen to',
     eyebrow: 'Python notebook model · listening',
-    you: 'Chance you listen to it',
-    base: 'Everyone surveyed',
+    you: 'Your multiplier (× as likely to listen)',
+    unit: 'chance you listen',
   },
 }
 
@@ -48,39 +57,55 @@ export default function FeelingsPage() {
   const pct = (v) => Math.round(v * 100)
   const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : Math.round(v * 100))
   const labels = result.items.map((i) => i.id)
-  const maxVal = Math.max(...result.items.flatMap((i) => [i.p, i.base]))
-  const max = which === 'python' ? 100 : Math.min(100, Math.ceil((maxVal * 100 + 5) / 10) * 10)
+
+  // Radar = each genre's multiplier vs the survey (p / base rate). The red ring is 1×: inside = less likely
+  // than the average person, outside = more likely. The scale zooms to the spread of values.
+  const lifts = result.items.map((i) => i.lift)
+  const CAP = 3
+  const nice = (v, up) => (up ? Math.ceil(v * 4) / 4 : Math.floor(v * 4) / 4)
+  const hi = Math.min(CAP, Math.max(1.25, nice(Math.max(...lifts) + 0.05, true)))
+  const lo = which === 'truman' ? 0 : Math.min(0.75, Math.max(0, nice(Math.min(...lifts) - 0.05, false)))
+  const step = hi - lo > 2 ? 0.5 : 0.25
+  const fmtX = (v) => `${Number(v.toFixed(2))}×`
 
   const data = {
     labels: labels.map(wrapLabel),
     datasets: [
       {
         label: copy.you,
-        data: result.items.map((i) => +(i.p * 100).toFixed(1)),
-        borderColor: CD.you,
-        backgroundColor: CD.youFill,
-        pointBorderColor: CD.you,
+        data: lifts.map((v) => Math.max(lo, Math.min(hi, v))),
+        borderColor: YOU,
+        backgroundColor: 'rgba(143, 124, 255, 0.28)',
+        pointBorderColor: YOU,
+        pointStyle: lifts.map((v) => (v > hi ? 'triangle' : 'circle')),
         fill: true,
       },
       {
-        label: copy.base,
-        data: result.items.map((i) => +(i.base * 100).toFixed(1)),
-        borderColor: CD.avg,
+        label: '1× = same as the average person',
+        data: labels.map(() => 1),
+        borderColor: RING,
+        borderWidth: 3,
         backgroundColor: 'transparent',
-        pointBorderColor: CD.avg,
-        pointStyle: 'rectRot',
-        borderDash: [6, 5],
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        pointHitRadius: 0,
         fill: false,
       },
     ],
   }
   const options = radarOptions({
     dark: true,
-    max,
-    step: max > 50 ? 25 : 10,
+    min: lo,
+    max: hi,
+    step,
     labelSize: 11,
     pointRadius: 3.5,
-    tooltipLabel: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw}%`,
+    tickFormat: fmtX,
+    tooltipFilter: (ctx) => ctx.datasetIndex === 0,
+    tooltipLabel: (ctx) => {
+      const it = result.items[ctx.dataIndex]
+      return ` ${fmtX(it.lift)} as likely: ${pct1(it.p)}% ${copy.unit} vs ${pct1(it.base)}% on average`
+    },
     tooltipTitle: (items) => labels[items[0].dataIndex],
   })
   options.animation = { duration: 450, easing: 'easeOutQuart' }
@@ -120,14 +145,14 @@ export default function FeelingsPage() {
 
         {which === 'truman' && (
           <div className="feel-extra">
-            <p className="feel-extra-note">Truman's model also uses your age and streaming service.</p>
+            <p className="feel-extra-note">Truman's model also uses your age and the platform you listen on.</p>
             <Slider name="Age" hint="How old you are" value={age} min={10} max={80} onChange={setAge} scale={['10', '80']} />
             <div className="feel-row">
-              <span className="feel-name">Streaming service</span>
+              <span className="feel-name">Which platform do you use?</span>
               <div className="service-pills" role="radiogroup" aria-label="Streaming service">
-                {truman.services.map((s) => (
-                  <button key={s} role="radio" aria-checked={service === s} className={service === s ? 'on' : ''} onClick={() => setService(s)}>
-                    {SERVICE_LABEL[s] || s}
+                {PLATFORMS.map((pl) => (
+                  <button key={pl.value} role="radio" aria-checked={service === pl.value} className={service === pl.value ? 'on' : ''} onClick={() => setService(pl.value)}>
+                    {pl.label}
                   </button>
                 ))}
               </div>
@@ -143,8 +168,10 @@ export default function FeelingsPage() {
         {which === 'truman' ? (
           <p className="feel-pick-sub">
             A <b>{pct1(pick.p)}%</b> chance it's your favorite genre, <b>{pick.lift.toFixed(1)}×</b> the survey
-            average ({pct1(pick.base)}%). The single most likely favorite is still <b>{mostLikely.id}</b> ({pct(mostLikely.p)}%),
-            because it's the most popular favorite overall.
+            average ({pct1(pick.base)}%).{' '}
+            {mostLikely.id === pick.id
+              ? <>It's also your single most likely favorite.</>
+              : <>The single most likely favorite is still <b>{mostLikely.id}</b> ({pct(mostLikely.p)}%), because it's the most popular favorite overall.</>}
           </p>
         ) : (
           <p className="feel-pick-sub">
@@ -154,12 +181,12 @@ export default function FeelingsPage() {
         )}
 
         <div className="legend">
-          <span><i className="key key-you" />{copy.you}</span>
-          <span><i className="key key-avg" />{copy.base}</span>
+          <span><i className="key key-mult" />{copy.you}</span>
+          <span><i className="key key-ring" />Red ring = 1× (same as the average person)</span>
         </div>
         <div className="chart-box chart-box-all">
           <Radar data={data} options={options} role="img"
-            aria-label={`Radar chart. ${copy.you}: ${result.items.map((i) => `${i.id} ${pct1(i.p)}%`).join(', ')}`} />
+            aria-label={`Radar chart of your multiplier vs the average person: ${result.items.map((i) => `${i.id} ${fmtX(i.lift)}`).join(', ')}`} />
         </div>
 
         {distinctive.length > 0 && (

@@ -22,6 +22,9 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
      one logistic regression each on the standardized 4 scores, P(listens at all, i.e. not "Never"). Exported exactly
      → `web/src/data/python_model.json`. Reported macro AUC 0.519 vs 0.453 baseline, permutation p < 0.001.
    - Headline = the option most over-represented for the user (lift vs base rate); the page also shows the most likely one.
+   - **Radar shows multipliers (lift = p / survey base rate), not percentages**, with a solid red ring at 1× (team feedback).
+     Truman's radar is 0–3× (values above 3× are drawn at the edge as triangles; tooltip shows the real value); Python's zooms
+     to its spread. Truman's platform choices: YouTube Music, Apple Music, Spotify, Pandora, Other.
    - Build both: `npm run feelings-models`
 
 ## Decisions already agreed with the team (don't undo without asking)

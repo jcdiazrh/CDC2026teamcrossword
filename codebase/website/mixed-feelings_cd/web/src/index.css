@@ -387,3 +387,5 @@ body.dark { background: #15101F; color: #F4EDE4; }
 .model-src { display: block; margin-top: 6px; font-size: 12px; opacity: .8; }
 .sig-list { margin: 8px 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 .sig-list span { opacity: .75; font-size: 12px; }
+.app.dark .key-mult { background: rgba(143, 124, 255, .35); border: 2px solid #8F7CFF; }
+.app.dark .key-ring { height: 0; border-radius: 0; border-top: 3px solid #F2553A; }
