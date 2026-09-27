@@ -11,8 +11,8 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
 3. Radar of the 4 mental-health scores reported by survey respondents with similar genre habits,
    overlaid on the whole-survey average, plus a "% say music improves their mental health" callout
 
-4. **Feelings → Music** (dark mode, slide switch at the top, no login): 4 score sliders, plus a model slide inside the page:
-   - **Truman's model** (default): **only the `## Model` section of `Music_predictor_Truman.qmd` counts** (team's call):
+4. **Feelings → Music** (dark mode, slide switch at the top, no login): 4 score sliders + age + platform, **Truman's model only** (team decision, Sep 27; the Python model's JSON/code are kept but no longer shown):
+   - **Truman's model**: **only the `## Model` section of `Music_predictor_Truman.qmd` counts** (team's call):
      `fit_mutDepMus2` = multinom(Fav genre [13 merged classes] ~ Age + 4 scores + streaming service), so the page also asks
      age + service. Fitted like nnet::multinom (no regularization, BFGS from 0, maxit 100) on mut_train (set.seed(101) 85%;
      `web/scripts/r_sample.py` reproduces R's sampler) → `web/src/data/truman_model.json`, incl. its tidy() table (Wald p-values).
@@ -25,8 +25,8 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
    - **Radar shows multipliers (lift = p / survey base rate), not percentages**, with a solid red ring at 1× (team feedback).
      Truman's radar is 0–3× (values above 3× are drawn at the edge as triangles; tooltip shows the real value); Python's zooms
      to its spread. Truman's platform choices: YouTube Music, Apple Music, Spotify, Pandora, Other.
-   - "Play Spotify's Top 100 <genre>" button (and ▶ on each lift row) opens Spotify's playlist search for that genre's
-     top-100 lists (page has no login, so it's a search link, not an API call).
+   - "Play Spotify's Top 100 <genre>" button (and ▶ on each lift row) opens Spotify search for "<genre> spotify top 100"
+     (e.g. https://open.spotify.com/search/jazz%20spotify%20top%20100), all results, not only playlists (team request).
    - Build both: `npm run feelings-models`
 
 ## Decisions already agreed with the team (don't undo without asking)

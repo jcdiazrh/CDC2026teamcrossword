@@ -2,8 +2,7 @@ import { useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
 import survey from '../data/survey.json'
 import truman from '../data/truman_model.json'
-import pyModel from '../data/python_model.json'
-import { trumanPredict, pythonPredict, trumanSignificant } from '../model/feelingsModels.js'
+import { trumanPredict, trumanSignificant } from '../model/feelingsModels.js'
 import { radarOptions, wrapLabel } from './charts.js'
 
 const FEELINGS = [
@@ -22,14 +21,14 @@ const PLATFORMS = [
 ]
 const RING = '#F2553A' // the red 1× ring
 
-// "Top 100" link for a genre: opens Spotify's playlist search for that genre's top-100 lists.
+// "Top 100" link for a genre: opens Spotify search for "<genre> spotify top 100" (e.g. "jazz spotify top 100").
 // (This page needs no login, so we link to Spotify search rather than calling the API.)
 const SEARCH_TERMS = {
   'Hip hop & Rap': 'hip hop rap', 'Pop & K-pop': 'pop', 'Rock & Metal': 'rock',
   'Hip hop, R&B & Rap': 'hip hop r&b', 'Metal & Rock': 'rock', 'K pop': 'k-pop',
 }
 const spotifyTop100 = (genre) =>
-  `https://open.spotify.com/search/${encodeURIComponent(`top 100 ${SEARCH_TERMS[genre] || genre.toLowerCase()}`)}/playlists`
+  `https://open.spotify.com/search/${encodeURIComponent(`${SEARCH_TERMS[genre] || genre.toLowerCase()} spotify top 100`)}`
 const YOU = '#8F7CFF'
 
 // The two models behind this page. "truman" is the default; the slide inside the page switches.
@@ -51,17 +50,14 @@ const MODELS = {
 }
 
 export default function FeelingsPage() {
-  const [which, setWhich] = useState('truman')
+  const which = 'truman' // Truman's model only (team decision); the Python model is no longer shown
   const [scores, setScores] = useState(() =>
     Object.fromEntries(FEELINGS.map((f) => [f.id, Math.round(survey.means[f.id])])))
   const [age, setAge] = useState(truman.ageDefault)
   const [service, setService] = useState('Spotify')
   const set = (id, v) => setScores((s) => ({ ...s, [id]: v }))
 
-  const result = useMemo(
-    () => (which === 'truman' ? trumanPredict(truman, { scores, age, service }) : pythonPredict(pyModel, { scores })),
-    [which, scores, age, service],
-  )
+  const result = useMemo(() => trumanPredict(truman, { scores, age, service }), [scores, age, service])
   const copy = MODELS[which]
   const pct = (v) => Math.round(v * 100)
   const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : Math.round(v * 100))
@@ -73,7 +69,7 @@ export default function FeelingsPage() {
   const CAP = 3
   const nice = (v, up) => (up ? Math.ceil(v * 4) / 4 : Math.floor(v * 4) / 4)
   const hi = Math.min(CAP, Math.max(1.25, nice(Math.max(...lifts) + 0.05, true)))
-  const lo = which === 'truman' ? 0 : Math.min(0.75, Math.max(0, nice(Math.min(...lifts) - 0.05, false)))
+  const lo = 0
   const step = hi - lo > 2 ? 0.5 : 0.25
   const fmtX = (v) => `${Number(v.toFixed(2))}×`
 
@@ -136,16 +132,6 @@ export default function FeelingsPage() {
         </p>
       </section>
 
-      {/* The slide inside this page: Truman's model <-> Python notebook model */}
-      <div className={`model-slide ${which === 'python' ? 'is-python' : ''}`} role="radiogroup" aria-label="Which model to use">
-        <span className="model-slide-thumb" aria-hidden="true" />
-        {Object.entries(MODELS).map(([id, m]) => (
-          <button key={id} role="radio" aria-checked={which === id} className={which === id ? 'on' : ''} onClick={() => setWhich(id)}>
-            <b>{m.tab}</b><small>{m.tabSub}</small>
-          </button>
-        ))}
-      </div>
-
       <section className="card feel-card">
         {FEELINGS.map((f) => (
           <Slider key={f.id} name={f.id} hint={f.hint} value={scores[f.id]} min={0} max={10}
@@ -174,20 +160,13 @@ export default function FeelingsPage() {
         <p className="eyebrow">{copy.eyebrow}</p>
         <p className="feel-lean">You lean toward</p>
         <h2 className="feel-pick" key={which + pick.id}>{pick.id}</h2>
-        {which === 'truman' ? (
-          <p className="feel-pick-sub">
+        <p className="feel-pick-sub">
             A <b>{pct1(pick.p)}%</b> chance it's your favorite genre, <b>{pick.lift.toFixed(1)}×</b> the survey
             average ({pct1(pick.base)}%).{' '}
             {mostLikely.id === pick.id
               ? <>It's also your single most likely favorite.</>
               : <>The single most likely favorite is still <b>{mostLikely.id}</b> ({pct(mostLikely.p)}%), because it's the most popular favorite overall.</>}
           </p>
-        ) : (
-          <p className="feel-pick-sub">
-            A <b>{pct(pick.p)}%</b> chance you listen to {pick.id}, versus {pct(pick.base)}% of everyone surveyed
-            {pick.lift > 1.03 ? <> (<b>{pick.lift.toFixed(2)}×</b>)</> : null}.
-          </p>
-        )}
 
         <a className="spotify-link" href={spotifyTop100(pick.id)} target="_blank" rel="noopener noreferrer">
           <SpotifyGlyph /> Play Spotify's Top 100 {pick.id} <span aria-hidden="true">↗</span>
@@ -209,7 +188,7 @@ export default function FeelingsPage() {
               {distinctive.map((i) => (
                 <li key={i.id}>
                   <span className="lift-name">{i.id}</span>
-                  <span className="lift-bar"><span style={{ width: `${Math.min(100, (i.lift - 1) * (which === 'truman' ? 50 : 250))}%` }} /></span>
+                  <span className="lift-bar"><span style={{ width: `${Math.min(100, (i.lift - 1) * 50)}%` }} /></span>
                   <span className="lift-num">{i.lift.toFixed(2)}×</span>
                   <a className="lift-play" href={spotifyTop100(i.id)} target="_blank" rel="noopener noreferrer"
                     aria-label={`Open Spotify's Top 100 ${i.id}`} title={`Spotify Top 100 ${i.id}`}>▶</a>
@@ -220,8 +199,7 @@ export default function FeelingsPage() {
         )}
 
         <div className="model-note">
-          {which === 'truman' ? (
-            <>
+          <>
               <b>What the model says.</b> {truman.formula}, a multinomial logistic regression. Effects with p &lt; 0.05,
               compared with the model's reference genre ({truman.reference}):
               <ul className="sig-list">
@@ -235,14 +213,6 @@ export default function FeelingsPage() {
               Everything else in the model wasn't significant, so most of what you see is the survey's overall favorites.
               <span className="model-src">{truman.source}. Fit on {truman.n} survey responses; Rock+Metal, Pop+K pop and Hip hop+Rap merged.</span>
             </>
-          ) : (
-            <>
-              <b>How good is it?</b> In 5-fold cross-validation its average AUC was {pyModel.reported.macroAuc} (0.5 = coin
-              flip; base-rate baseline {pyModel.reported.baselineAuc}). A permutation test says that's better than chance
-              (p {pyModel.reported.permutationP}), but the signal is weak. "Listen" means answering anything but Never.
-              <span className="model-src">{pyModel.source}. Genre clusters were chosen by the notebook from listening correlations.</span>
-            </>
-          )}
         </div>
 
         <p className="disclaimer">
