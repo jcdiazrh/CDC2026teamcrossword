@@ -9,4 +9,5 @@ Country music listeners on average reported a depression score 0.72 lower than n
 Rock listeners on average reported a depression score 0.92 higher than non-rock listeners.
 Metal listeners on average reported an insomnia score 1.02 higher than non-metal listeners.
 
-Care should be taken though, because of the multiple comparisons problem--with 64 p-values it is likely some will be significant by random chance.
+Care should be taken though, because of the multiple comparisons problem--with 64 p-values it is almost entirely 
+due to random chance that these coefficients are significant.
