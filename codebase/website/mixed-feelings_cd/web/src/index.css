@@ -404,3 +404,8 @@ body.dark { background: #15101F; color: #F4EDE4; }
   width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; text-decoration: none;
   background: #1ED760; color: #0B0B0B; border: 2px solid var(--ink);
 }
+
+/* conviction: genres the user really leans toward */
+.app.dark .key-lean { width: 12px; height: 12px; border-radius: 50%; background: #FFC23D; }
+.feel-pick-none { color: var(--ink); }
+.feel-block-sub { margin: -6px 0 10px; font-size: 13px; color: var(--ink-2); }
