@@ -49,7 +49,7 @@ export function buildProfile(listening) {
   const ranked = SURVEY_GENRES.filter((g) => shares[g] > 0).sort((a, b) => shares[b] - shares[a])
   const entropy = -Object.values(shares).filter((s) => s > 0).reduce((s, p) => s + p * Math.log(p), 0)
 
-  // The 13 display groups (Hip hop+Rap, Pop+K pop, Rock+Metal merged) used by the genre charts and title
+  // The 11 display groups (Hip hop+Rap, Pop+K pop, Rock+Metal merged) used by the genre charts and title
   const groupShares = sumByGroup(shares)
   const groupRanked = GROUP_IDS.filter((g) => groupShares[g] > 0).sort((a, b) => groupShares[b] - groupShares[a])
   const artistsByGroup = Object.fromEntries(GROUPS.map((g) => [g.id, [...new Set(g.members.flatMap((m) => artistsByGenre[m]))]]))

@@ -8,9 +8,9 @@ export default function GenreCard({ profile, dark = false }) {
   const [showAll, setShowAll] = useState(false)
   const [activeGenre, setActiveGenre] = useState(profile.groupRanked[0])
 
-  // Uses the 13 display groups (Hip hop+Rap, Pop+K pop, Rock+Metal merged; see lib/groups.js).
+  // Uses the 11 display groups (Hip hop+Rap, Pop+K pop, Rock+Metal merged; see lib/groups.js).
   // Top 5: always 5 axes (padded with 0% groups) so the shape stays a pentagon.
-  // All 13: fixed order, so everyone's shape is comparable.
+  // All 11: fixed order, so everyone's shape is comparable.
   const shares = profile.groupShares
   let axes
   if (showAll) {
@@ -71,11 +71,11 @@ export default function GenreCard({ profile, dark = false }) {
       <div className="card-head">
         <div>
           <p className="eyebrow">01 · your sound</p>
-          <h3 className="card-title">{showAll ? 'All 13 genres' : 'Your top 5 genres'}</h3>
+          <h3 className="card-title">{showAll ? 'All 11 genres' : 'Your top 5 genres'}</h3>
         </div>
         <div className="range small toggle" role="radiogroup" aria-label="How many genres to show" data-html2img-ignore>
           <button role="radio" aria-checked={!showAll} className={!showAll ? 'on' : ''} onClick={() => toggle(false)}>Top 5</button>
-          <button role="radio" aria-checked={showAll} className={showAll ? 'on' : ''} onClick={() => toggle(true)}>All 13</button>
+          <button role="radio" aria-checked={showAll} className={showAll ? 'on' : ''} onClick={() => toggle(true)}>All 11</button>
         </div>
       </div>
       <div className={`chart-box ${showAll ? 'chart-box-all' : ''}`}>

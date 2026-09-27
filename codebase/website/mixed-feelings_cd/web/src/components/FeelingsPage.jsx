@@ -4,6 +4,7 @@ import survey from '../data/survey.json'
 import truman from '../data/truman_model.json'
 import { trumanPredict, trumanSignificant } from '../model/feelingsModels.js'
 import { radarOptions, wrapLabel } from './charts.js'
+import { spotifyTop100 } from '../lib/spotifyPlaylists.js'
 
 const FEELINGS = [
   { id: 'Anxiety', hint: 'Worry, nervousness, feeling on edge' },
@@ -21,14 +22,6 @@ const PLATFORMS = [
 ]
 const RING = '#F2553A' // the red 1× ring
 
-// "Top 100" link for a genre: opens Spotify search for "<genre> spotify top 100" (e.g. "jazz spotify top 100").
-// (This page needs no login, so we link to Spotify search rather than calling the API.)
-const SEARCH_TERMS = {
-  'Hip hop & Rap': 'hip hop rap', 'Pop & K-pop': 'pop', 'Rock & Metal': 'rock',
-  'Hip hop, R&B & Rap': 'hip hop r&b', 'Metal & Rock': 'rock', 'K pop': 'k-pop',
-}
-const spotifyTop100 = (genre) =>
-  `https://open.spotify.com/search/${encodeURIComponent(`${SEARCH_TERMS[genre] || genre.toLowerCase()} spotify top 100`)}`
 const YOU = '#8F7CFF'
 
 // The two models behind this page. "truman" is the default; the slide inside the page switches.
