@@ -1,4 +1,5 @@
-Using the data, I looked to predict an individuals favorite genre based on the variables given.
+Using the data, I looked to predict an individuals favorite genre based on the variables given using a multinomial logistic
+regression model.
 
 I initially checked GVIF for all the variables not counting frequency stats finding
 little  evidence for multicollinearity between the variables
