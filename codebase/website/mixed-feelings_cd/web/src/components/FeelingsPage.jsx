@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
 import survey from '../data/survey.json'
 import truman from '../data/truman_model.json'
-import { trumanPredict, trumanSignificant, MIN_LIFT, MIN_P } from '../model/feelingsModels.js'
+import { trumanPredict, MIN_LIFT, MIN_P } from '../model/feelingsModels.js'
 import { radarOptions, wrapLabel } from './charts.js'
 import { spotifyTop100 } from '../lib/spotifyPlaylists.js'
 
@@ -218,23 +218,6 @@ export default function FeelingsPage() {
             </ul>
           </div>
         )}
-
-        <div className="model-note">
-          <>
-              <b>What the model says.</b> {truman.formula}, a multinomial logistic regression. Effects with p &lt; 0.05,
-              compared with the model's reference genre ({truman.reference}):
-              <ul className="sig-list">
-                {trumanSignificant(truman).map((t) => (
-                  <li key={t.level + t.term}>
-                    <b>{t.term}</b> {t.estimate > 0 ? '↑' : '↓'} <b>{t.level}</b> as a favorite:
-                    odds ×{Math.exp(t.estimate).toFixed(2)} per {t.term === 'Age' ? 'year' : 'point'} <span>(p = {t.p.toFixed(3)})</span>
-                  </li>
-                ))}
-              </ul>
-              Everything else in the model wasn't significant, so most of what you see is the survey's overall favorites.
-              <span className="model-src">{truman.source}. Fit on {truman.n} survey responses; Rock+Metal, Pop+K pop and Hip hop+Rap merged.</span>
-            </>
-        </div>
 
         <p className="disclaimer">
           How you feel doesn't decide your taste. These are small patterns in a voluntary survey, not a diagnosis.
