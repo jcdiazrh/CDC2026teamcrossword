@@ -16,7 +16,7 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
      `fit_mutDepMus2` = multinom(Fav genre [11 classes: merged, no Gospel/Latin] ~ Age + 4 scores + streaming service), so the page also asks
      age + service. Fitted like nnet::multinom (no regularization, BFGS from 0, maxit 100) on mut_train (set.seed(101) 85%;
      `web/scripts/r_sample.py` reproduces R's sampler) → `web/src/data/truman_model.json`, incl. its tidy() table (Wald p-values).
-     The page lists the p < 0.05 effects (Anxiety→Folk, Anxiety→Pop & K-pop, Age→VGM). Don't pull in the
+     The "What the model says" box was removed from the page for good (team, Sep 27). Don't pull in the
      qmd's other sections (confusion matrices, reweighting) without asking.
    - **Python model** (`python notebook/notebook.ipynb`, `music_genre_model.joblib`): 13 correlation-clustered genre groups,
      one logistic regression each on the standardized 4 scores, P(listens at all, i.e. not "Never"). Exported exactly
