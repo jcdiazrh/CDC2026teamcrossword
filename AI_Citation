@@ -9,5 +9,6 @@ Marked down in code where Gen AI is used. Plots/Graphs--genAI, Model not used in
 
 
 Juan's Website:
-Prompted to create react UI interface, Spotify API, 
+Prompted Claude to create react UI, Logic and Spotify API usage, GIT pull and push merges, all used Claude.
+Basically the whole webpage is generated with Claude and tweaked by Juan.
 
