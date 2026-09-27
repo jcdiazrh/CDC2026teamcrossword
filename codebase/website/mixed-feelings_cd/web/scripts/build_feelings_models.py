@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from r_sample import RRNG  # noqa: E402
 
 CONDS = ["Anxiety", "Depression", "Insomnia", "OCD"]
+EXCLUDE = {"Gospel", "Latin"}   # removed from the app for good (team decision)
 df = pd.read_csv(CSV)
 r = lambda x, n=5: float(round(float(x), n))  # noqa: E731
 
@@ -50,6 +51,9 @@ def build_truman():
     n = len(d)
     train_idx = np.array(RRNG(101).sample(n, int(np.floor(0.85 * n)))) - 1   # mut_train_DepMus
     train = d.iloc[train_idx].dropna(subset=["Age", "Primary streaming service", "fav"])
+    # Team decision: Gospel and Latin are removed from the app for good (too few fans: 6 and 2 in training).
+    # Their fans are dropped, so the model has 11 favorite-genre classes.
+    train = train[~train["fav"].isin(EXCLUDE)]
     services = sorted(d["Primary streaming service"].dropna().unique())      # R factor levels; first = reference
     terms = ["(Intercept)", "Age"] + CONDS + [f"service: {s}" for s in services[1:]]
 

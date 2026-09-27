@@ -15,7 +15,7 @@ export default function UnderHood({ profile, model, onModel }) {
       <table className="hood-table">
         <thead><tr><th>Genre</th><th>Share</th><th>As a survey answer</th><th title="The team model counts you as a listener if Sometimes or more">Listener?</th></tr></thead>
         <tbody>
-          {SURVEY_GENRES.map((g) => (
+          {SURVEY_GENRES.filter((g) => g !== 'Gospel' && g !== 'Latin').map((g) => ( // Gospel + Latin hidden app-wide (team decision)
             <tr key={g} className={profile.levels[g] ? '' : 'dim'}>
               <td>{g}</td>
               <td>{(profile.shares[g] * 100).toFixed(1)}%</td>

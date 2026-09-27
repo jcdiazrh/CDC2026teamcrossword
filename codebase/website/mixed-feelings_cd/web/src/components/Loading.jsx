@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 const LINES = [
   'Flipping through your top 50 artists…',
-  'Sorting micro-genres into 13 buckets…',
+  'Sorting micro-genres into 11 buckets…',
   'Finding survey listeners who sound like you…',
   'Workshopping your title…',
 ]

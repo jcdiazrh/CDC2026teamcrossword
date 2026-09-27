@@ -6,17 +6,17 @@ Depression / Insomnia / OCD). The web app lives in `codebase/website/mixed-feeli
 
 ## What the app does
 Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 months default** / all time) →
-1. Radar of your top 5 genres (toggle: all 13). **13 display groups** = the survey's 16 with Hip hop+Rap, Pop+K pop, Rock+Metal merged (`web/src/lib/groups.js`); models still use all 16
+1. Radar of your top 5 genres (toggle: all 11). **11 display groups** = the survey's 16 with Hip hop+Rap, Pop+K pop, Rock+Metal merged and Gospel + Latin removed (`web/src/lib/groups.js`); models still use all 16
 2. A fun title ("Moody Metalhead"): noun from genre #1, adjective from genre #2 or taste variety, with a dice reroll
 3. Radar of the 4 mental-health scores reported by survey respondents with similar genre habits,
    overlaid on the whole-survey average, plus a "% say music improves their mental health" callout
 
 4. **Feelings → Music** (dark mode, slide switch at the top, no login): 4 score sliders + age + platform, **Truman's model only** (team decision, Sep 27; the Python model's JSON/code are kept but no longer shown):
    - **Truman's model**: **only the `## Model` section of `Music_predictor_Truman.qmd` counts** (team's call):
-     `fit_mutDepMus2` = multinom(Fav genre [13 merged classes] ~ Age + 4 scores + streaming service), so the page also asks
+     `fit_mutDepMus2` = multinom(Fav genre [11 classes: merged, no Gospel/Latin] ~ Age + 4 scores + streaming service), so the page also asks
      age + service. Fitted like nnet::multinom (no regularization, BFGS from 0, maxit 100) on mut_train (set.seed(101) 85%;
      `web/scripts/r_sample.py` reproduces R's sampler) → `web/src/data/truman_model.json`, incl. its tidy() table (Wald p-values).
-     The page lists the p < 0.05 effects (Anxiety→Folk, Anxiety→Pop & K-pop, Age→Gospel, Age→VGM). Don't pull in the
+     The page lists the p < 0.05 effects (Anxiety→Folk, Anxiety→Pop & K-pop, Age→VGM). Don't pull in the
      qmd's other sections (confusion matrices, reweighting) without asking.
    - **Python model** (`python notebook/notebook.ipynb`, `music_genre_model.joblib`): 13 correlation-clustered genre groups,
      one logistic regression each on the standardized 4 scores, P(listens at all, i.e. not "Never"). Exported exactly
@@ -25,11 +25,14 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
    - **Radar shows multipliers (lift = p / survey base rate), not percentages**, with a solid red ring at 1× (team feedback).
      Truman's radar is 0–3× (values above 3× are drawn at the edge as triangles; tooltip shows the real value); Python's zooms
      to its spread. Truman's platform choices: YouTube Music, Apple Music, Spotify, Pandora, Other.
-   - "Play Spotify's Top 100 <genre>" button (and ▶ on each lift row) opens Spotify search for "<genre> spotify top 100"
-     (e.g. https://open.spotify.com/search/jazz%20spotify%20top%20100), all results, not only playlists (team request).
+   - "Play Spotify's Top 100 <genre>" button (and ▶ on each lift row) opens a real Spotify top-100 playlist per genre
+     (`web/src/lib/spotifyPlaylists.js`). Search-page links opened blank, so don't go back to them.
    - Build both: `npm run feelings-models`
 
 ## Decisions already agreed with the team (don't undo without asking)
+- **Gospel and Latin are removed from the app for good** (Sep 27): not in the genre charts (11 display groups), not in Truman's
+  model (their fans are dropped before fitting → 11 classes), hidden in Under the hood. Ari's regression still uses all 16
+  survey genres as inputs (it was fit that way) but neither genre is shown.
 - Stack: React + Vite + Chart.js, browser-only Spotify PKCE login (no server, no client secret)
 - Spotify only. Apple Music was dropped (needs a paid dev account plus a signed server token, and has no top-artists-by-time endpoint)
 - No public demo mode: login is the point. `?mock=metal|pop|mixed|nogenres` exists **in dev only**
