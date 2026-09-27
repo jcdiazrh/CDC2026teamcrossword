@@ -21,6 +21,15 @@ const PLATFORMS = [
   { value: 'Other streaming service', label: 'Other' },
 ]
 const RING = '#F2553A' // the red 1× ring
+
+// "Top 100" link for a genre: opens Spotify's playlist search for that genre's top-100 lists.
+// (This page needs no login, so we link to Spotify search rather than calling the API.)
+const SEARCH_TERMS = {
+  'Hip hop & Rap': 'hip hop rap', 'Pop & K-pop': 'pop', 'Rock & Metal': 'rock',
+  'Hip hop, R&B & Rap': 'hip hop r&b', 'Metal & Rock': 'rock', 'K pop': 'k-pop',
+}
+const spotifyTop100 = (genre) =>
+  `https://open.spotify.com/search/${encodeURIComponent(`top 100 ${SEARCH_TERMS[genre] || genre.toLowerCase()}`)}/playlists`
 const YOU = '#8F7CFF'
 
 // The two models behind this page. "truman" is the default; the slide inside the page switches.
@@ -180,6 +189,10 @@ export default function FeelingsPage() {
           </p>
         )}
 
+        <a className="spotify-link" href={spotifyTop100(pick.id)} target="_blank" rel="noopener noreferrer">
+          <SpotifyGlyph /> Play Spotify's Top 100 {pick.id} <span aria-hidden="true">↗</span>
+        </a>
+
         <div className="legend">
           <span><i className="key key-mult" />{copy.you}</span>
           <span><i className="key key-ring" />Red ring = 1× (same as the average person)</span>
@@ -198,6 +211,8 @@ export default function FeelingsPage() {
                   <span className="lift-name">{i.id}</span>
                   <span className="lift-bar"><span style={{ width: `${Math.min(100, (i.lift - 1) * (which === 'truman' ? 50 : 250))}%` }} /></span>
                   <span className="lift-num">{i.lift.toFixed(2)}×</span>
+                  <a className="lift-play" href={spotifyTop100(i.id)} target="_blank" rel="noopener noreferrer"
+                    aria-label={`Open Spotify's Top 100 ${i.id}`} title={`Spotify Top 100 ${i.id}`}>▶</a>
                 </li>
               ))}
             </ul>
@@ -257,5 +272,14 @@ function Slider({ name, hint, value, min, max, onChange, scale }) {
       />
       <span className="feel-scale" aria-hidden="true"><span>{scale[0]}</span><span>{scale[1]}</span></span>
     </label>
+  )
+}
+
+function SpotifyGlyph() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="12" fill="#1ED760" />
+      <path d="M6.5 9.3c3.7-1.1 7.9-.8 11.2 1M7.2 12.4c3-.8 6.4-.5 9.1.9M7.8 15.3c2.4-.6 5-.4 7.2.8" stroke="#111" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+    </svg>
   )
 }

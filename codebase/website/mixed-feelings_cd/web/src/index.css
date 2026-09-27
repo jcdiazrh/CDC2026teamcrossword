@@ -389,3 +389,18 @@ body.dark { background: #15101F; color: #F4EDE4; }
 .sig-list span { opacity: .75; font-size: 12px; }
 .app.dark .key-mult { background: rgba(143, 124, 255, .35); border: 2px solid #8F7CFF; }
 .app.dark .key-ring { height: 0; border-radius: 0; border-top: 3px solid #F2553A; }
+
+/* Spotify "Top 100" links on the Feelings → Music result */
+.spotify-link {
+  display: inline-flex; align-items: center; gap: 10px; margin: 2px 0 14px; padding: 10px 16px; border-radius: 999px;
+  background: #1ED760; color: #0B0B0B; font-family: var(--display); font-weight: 800; font-size: 15px; text-decoration: none;
+  border: 2.5px solid var(--ink); box-shadow: 0 4px 0 var(--grape); transition: transform .12s, box-shadow .12s;
+}
+.spotify-link:hover { transform: translateY(-2px); }
+.spotify-link:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--grape); }
+.spotify-link:focus-visible, .lift-play:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+.lift-list li { grid-template-columns: 1fr 1.2fr auto auto; }
+.lift-play {
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; text-decoration: none;
+  background: #1ED760; color: #0B0B0B; border: 2px solid var(--ink);
+}
