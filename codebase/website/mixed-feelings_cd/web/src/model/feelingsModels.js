@@ -4,6 +4,10 @@
 
 const sigmoid = (z) => 1 / (1 + Math.exp(-z))
 
+// What counts as a real lean on the Feelings → Music page
+export const MIN_LIFT = 1.2 // at least 1.2× as likely as the average person (clearly outside the red ring)
+export const MIN_P = 0.08   // and at least an 8% chance of being your favorite
+
 /** Pick the option most over-represented for you (lift vs base rate), ignoring near-zero ones */
 function liftPick(items, minP) {
   const ok = items.filter((i) => i.p >= minP)
@@ -27,11 +31,13 @@ export function trumanPredict(truman, { scores, age, service }) {
     const p = e[c] / total
     return { id, p, base: truman.base[id], lift: p / truman.base[id] }
   })
-  const ranked = liftPick(items, 0.03)
+  // A "lean" needs conviction: clearly outside the 1× ring (≥ MIN_LIFT) AND a real chance (≥ MIN_P).
+  // Among those, the most likely one is the pick. If none qualify, there is no strong lean.
+  const leans = items.filter((i) => i.lift >= MIN_LIFT && i.p >= MIN_P).sort((a, b) => b.p - a.p)
   return {
     items,
-    pick: ranked[0],
-    distinctive: ranked.filter((i) => i.lift > 1.05).slice(0, 3),
+    pick: leans[0] || null,
+    leans,
     mostLikely: [...items].sort((a, b) => b.p - a.p)[0],
   }
 }

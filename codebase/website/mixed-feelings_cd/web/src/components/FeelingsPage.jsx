@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
 import survey from '../data/survey.json'
 import truman from '../data/truman_model.json'
-import { trumanPredict, trumanSignificant } from '../model/feelingsModels.js'
+import { trumanPredict, trumanSignificant, MIN_LIFT, MIN_P } from '../model/feelingsModels.js'
 import { radarOptions, wrapLabel } from './charts.js'
 import { spotifyTop100 } from '../lib/spotifyPlaylists.js'
 
@@ -23,6 +23,7 @@ const PLATFORMS = [
 const RING = '#F2553A' // the red 1× ring
 
 const YOU = '#8F7CFF'
+const LEAN = '#FFC23D' // genres you really lean toward
 
 // The two models behind this page. "truman" is the default; the slide inside the page switches.
 const MODELS = {
@@ -59,6 +60,8 @@ export default function FeelingsPage() {
   // Radar = each genre's multiplier vs the survey (p / base rate). The red ring is 1×: inside = less likely
   // than the average person, outside = more likely. The scale zooms to the spread of values.
   const lifts = result.items.map((i) => i.lift)
+  // A genre is a real lean when it's clearly outside the red ring AND has a real chance (see feelingsModels.js)
+  const isLean = (i) => i.lift >= MIN_LIFT && i.p >= MIN_P
   const CAP = 3
   const nice = (v, up) => (up ? Math.ceil(v * 4) / 4 : Math.floor(v * 4) / 4)
   const hi = Math.min(CAP, Math.max(1.25, nice(Math.max(...lifts) + 0.05, true)))
@@ -74,7 +77,9 @@ export default function FeelingsPage() {
         data: lifts.map((v) => Math.max(lo, Math.min(hi, v))),
         borderColor: YOU,
         backgroundColor: 'rgba(143, 124, 255, 0.28)',
-        pointBorderColor: YOU,
+        pointBorderColor: result.items.map((i) => (isLean(i) ? LEAN : YOU)),
+        pointBackgroundColor: result.items.map((i) => (isLean(i) ? LEAN : '#211A33')),
+        pointRadius: result.items.map((i) => (isLean(i) ? 7 : 3.5)),
         pointStyle: lifts.map((v) => (v > hi ? 'triangle' : 'circle')),
         fill: true,
       },
@@ -106,9 +111,17 @@ export default function FeelingsPage() {
     },
     tooltipTitle: (items) => labels[items[0].dataIndex],
   })
-  options.animation = { duration: 450, easing: 'easeOutQuart' }
+  options.animation = { duration: 350, easing: 'easeOutQuart' }
+  // Leaning genres get a bright label with a star; everything else is dimmed
+  options.scales.r.pointLabels.color = (ctx) => (isLean(result.items[ctx.index]) ? LEAN : 'rgba(244, 237, 228, 0.55)')
+  options.scales.r.pointLabels.callback = (label, i) => {
+    const text = Array.isArray(label) ? label : [label]
+    return isLean(result.items[i]) ? [...text.slice(0, -1), `${text[text.length - 1]} ★`] : label
+  }
+  // Rebuild the chart whenever an input changes, so it can never lag behind the text (seen in Safari)
+  const chartKey = `${scores.Anxiety}-${scores.Depression}-${scores.Insomnia}-${scores.OCD}-${age}-${service}`
 
-  const { pick, mostLikely, distinctive } = result
+  const { pick, mostLikely, leans } = result
 
   return (
     <main className="feelings">
@@ -151,38 +164,53 @@ export default function FeelingsPage() {
 
       <section className="card feel-result" aria-live="polite">
         <p className="eyebrow">{copy.eyebrow}</p>
-        <p className="feel-lean">You lean toward</p>
-        <h2 className="feel-pick" key={which + pick.id}>{pick.id}</h2>
-        <p className="feel-pick-sub">
-            A <b>{pct1(pick.p)}%</b> chance it's your favorite genre, <b>{pick.lift.toFixed(1)}×</b> the survey
-            average ({pct1(pick.base)}%).{' '}
-            {mostLikely.id === pick.id
-              ? <>It's also your single most likely favorite.</>
-              : <>The single most likely favorite is still <b>{mostLikely.id}</b> ({pct(mostLikely.p)}%), because it's the most popular favorite overall.</>}
-          </p>
+        {pick ? (
+          <>
+            <p className="feel-lean">You lean toward</p>
+            <h2 className="feel-pick" key={pick.id}>{pick.id}</h2>
+            <p className="feel-pick-sub">
+              A <b>{pct(pick.p)}%</b> chance it's your favorite genre, <b>{pick.lift.toFixed(1)}×</b> the average
+              person ({pct1(pick.base)}%), so it sits clearly outside the red ring.{' '}
+              {mostLikely.id === pick.id
+                ? <>It's also your single most likely favorite.</>
+                : <>The single most likely favorite is still <b>{mostLikely.id}</b> ({pct(mostLikely.p)}%), because it's the most popular favorite overall.</>}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="feel-lean">No strong lean</p>
+            <h2 className="feel-pick feel-pick-none" key="none">Right on the average</h2>
+            <p className="feel-pick-sub">
+              No genre is both clearly outside the red ring ({MIN_LIFT}× or more) and a real possibility ({pct(MIN_P)}%+ chance).
+              Like most people in the survey, your most likely favorite is <b>{mostLikely.id}</b> ({pct(mostLikely.p)}%).
+            </p>
+          </>
+        )}
 
-        <a className="spotify-link" href={spotifyTop100(pick.id)} target="_blank" rel="noopener noreferrer">
-          <SpotifyGlyph /> Play Spotify's Top 100 {pick.id} <span aria-hidden="true">↗</span>
+        <a className="spotify-link" href={spotifyTop100((pick || mostLikely).id)} target="_blank" rel="noopener noreferrer">
+          <SpotifyGlyph /> Play Spotify's Top 100 {(pick || mostLikely).id} <span aria-hidden="true">↗</span>
         </a>
 
         <div className="legend">
           <span><i className="key key-mult" />{copy.you}</span>
           <span><i className="key key-ring" />Red ring = 1× (same as the average person)</span>
+          <span><i className="key key-lean" />★ Genres you really lean toward</span>
         </div>
         <div className="chart-box chart-box-all">
-          <Radar data={data} options={options} role="img"
+          <Radar key={chartKey} data={data} options={options} role="img"
             aria-label={`Radar chart of your multiplier vs the average person: ${result.items.map((i) => `${i.id} ${fmtX(i.lift)}`).join(', ')}`} />
         </div>
 
-        {distinctive.length > 0 && (
+        {leans.length > 0 && (
           <div className="feel-block">
-            <p className="feel-block-title">Bigger for you than for the average person</p>
+            <p className="feel-block-title">Genres you really lean toward</p>
+            <p className="feel-block-sub">Outside the red ring ({MIN_LIFT}×+) with at least a {pct(MIN_P)}% chance of being your favorite.</p>
             <ul className="lift-list">
-              {distinctive.map((i) => (
+              {leans.map((i) => (
                 <li key={i.id}>
                   <span className="lift-name">{i.id}</span>
                   <span className="lift-bar"><span style={{ width: `${Math.min(100, (i.lift - 1) * 50)}%` }} /></span>
-                  <span className="lift-num">{i.lift.toFixed(2)}×</span>
+                  <span className="lift-num">{i.lift.toFixed(1)}× · {pct(i.p)}%</span>
                   <a className="lift-play" href={spotifyTop100(i.id)} target="_blank" rel="noopener noreferrer"
                     aria-label={`Open Spotify's Top 100 ${i.id}`} title={`Spotify Top 100 ${i.id}`}>▶</a>
                 </li>

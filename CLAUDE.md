@@ -21,7 +21,10 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
    - **Python model** (`python notebook/notebook.ipynb`, `music_genre_model.joblib`): 13 correlation-clustered genre groups,
      one logistic regression each on the standardized 4 scores, P(listens at all, i.e. not "Never"). Exported exactly
      → `web/src/data/python_model.json`. Reported macro AUC 0.519 vs 0.453 baseline, permutation p < 0.001.
-   - Headline = the option most over-represented for the user (lift vs base rate); the page also shows the most likely one.
+   - **Headline needs conviction** (team feedback Sep 27): a genre is a "lean" only if lift ≥ 1.2× (clearly outside the red
+     ring) AND p ≥ 8% (`MIN_LIFT`/`MIN_P` in `web/src/model/feelingsModels.js`); the pick is the most likely lean. If none
+     qualify the page says "No strong lean / Right on the average". Leans are starred + yellow on the radar.
+   - The radar remounts on every input change (`key`), because Safari left it showing stale values.
    - **Radar shows multipliers (lift = p / survey base rate), not percentages**, with a solid red ring at 1× (team feedback).
      Truman's radar is 0–3× (values above 3× are drawn at the edge as triangles; tooltip shows the real value); Python's zooms
      to its spread. Truman's platform choices: YouTube Music, Apple Music, Spotify, Pandora, Other.
