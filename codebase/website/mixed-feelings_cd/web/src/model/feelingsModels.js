@@ -11,20 +11,20 @@ function liftPick(items, minP) {
 }
 
 /**
- * Truman's multinomial model: P(favorite genre = class) from age, the 4 scores and streaming service.
- * Returns items [{ id, p, base, lift }] in class order, plus the pick and the most likely class.
+ * Truman's model (fit_mutDepMus2, the "## Model" section of Music_predictor_Truman.qmd):
+ * multinomial logistic regression, P(favorite genre = class) from age, the 4 scores and streaming service.
+ * truman.W has one row per class (the reference class row is all 0) and one column per term:
+ * (Intercept), Age, Anxiety, Depression, Insomnia, OCD, then one 0/1 dummy per non-reference service.
  */
 export function trumanPredict(truman, { scores, age, service }) {
-  const x = [
-    ...truman.numeric.map((k, i) => ((k === 'Age' ? age : scores[k]) - truman.mean[i]) / truman.scale[i]),
-    ...truman.services.map((s) => (s === service ? 1 : 0)),
-  ]
-  const z = truman.intercept.map((b, c) => b + truman.coef[c].reduce((s, w, j) => s + w * x[j], 0))
+  const x = [1, age, scores.Anxiety, scores.Depression, scores.Insomnia, scores.OCD,
+    ...truman.services.slice(1).map((s) => (s === service ? 1 : 0))]
+  const z = truman.W.map((row) => row.reduce((sum, w, j) => sum + w * x[j], 0))
   const zMax = Math.max(...z)
   const e = z.map((v) => Math.exp(v - zMax))
-  const sum = e.reduce((a, b) => a + b, 0)
+  const total = e.reduce((a, b) => a + b, 0)
   const items = truman.classes.map((id, c) => {
-    const p = e[c] / sum
+    const p = e[c] / total
     return { id, p, base: truman.base[id], lift: p / truman.base[id] }
   })
   const ranked = liftPick(items, 0.03)
@@ -34,6 +34,11 @@ export function trumanPredict(truman, { scores, age, service }) {
     distinctive: ranked.filter((i) => i.lift > 1.05).slice(0, 3),
     mostLikely: [...items].sort((a, b) => b.p - a.p)[0],
   }
+}
+
+/** Rows of the model's tidy() table with p < 0.05 (intercepts left out), for the "what the model says" box */
+export function trumanSignificant(truman) {
+  return truman.table.filter((t) => t.p < 0.05 && t.term !== '(Intercept)')
 }
 
 /**

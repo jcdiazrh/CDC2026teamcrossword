@@ -1,17 +1,16 @@
 """
 Builds the two models behind the "Feelings -> Music" page:
 
-  src/data/truman_model.json   Truman's multinomial model (Music_predictor_Truman.qmd, final model
-                               fit_mutDepMus2): favorite genre ~ Age + Anxiety + Depression + Insomnia
-                               + OCD + Primary streaming service, with Rock+Metal, Pop+K pop and
-                               Hip hop+Rap merged (13 classes). Refit here with the same predictors and
-                               the same set.seed(101) 85% training split as the R code.
+  src/data/truman_model.json   Truman's model: the '## Model' section of Music_predictor_Truman.qmd,
+                               fit_mutDepMus2 = multinom(favorite genre ~ Age + Anxiety + Depression
+                               + Insomnia + OCD + streaming service) on 13 merged genres, fitted like
+                               nnet::multinom (no regularization) plus its tidy() table of p-values.
   src/data/python_model.json   The Python notebook's model ("python notebook/music_genre_model.joblib"):
                                13 genre clusters, one logistic regression each on the 4 standardized
                                scores, P(listens to the cluster at all). Exported exactly from the joblib.
 
     python scripts/build_feelings_models.py      (or: npm run feelings-models)
-Needs pandas, numpy, scikit-learn, joblib.
+Needs pandas, numpy, scipy, scikit-learn, joblib.
 """
 import json
 import sys
@@ -37,61 +36,80 @@ r = lambda x, n=5: float(round(float(x), n))  # noqa: E731
 
 # ------------------------------------------------------------------ Truman
 def build_truman():
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.metrics import log_loss
+    """fit_mutDepMus2 from the '## Model' section of Music_predictor_Truman.qmd:
+    multinom(Fav.genre ~ Age + Anxiety + Depression + Insomnia + OCD + Primary.streaming.service, mut_train_DepMus)
+    Fitted like R's nnet::multinom: plain (unregularized) softmax regression, BFGS from zero weights, 100 iterations
+    (multinom's default maxit), first factor level as the reference class. p-values = Wald tests (what tidy() reports)."""
+    from scipy.optimize import minimize
+    from scipy.stats import norm
 
     collapse = {"Metal": "Rock & Metal", "Rock": "Rock & Metal", "Pop": "Pop & K-pop", "K pop": "Pop & K-pop",
                 "Rap": "Hip hop & Rap", "Hip hop": "Hip hop & Rap"}
     d = df.copy()
     d["fav"] = d["Fav genre"].map(lambda g: collapse.get(g, g))
     n = len(d)
-    train_idx = np.array(RRNG(101).sample(n, int(np.floor(0.85 * n)))) - 1   # same split as the R code
-    test_idx = np.setdiff1d(np.arange(n), train_idx)
-    services = sorted(d["Primary streaming service"].dropna().unique())
-    numeric = ["Age"] + CONDS
+    train_idx = np.array(RRNG(101).sample(n, int(np.floor(0.85 * n)))) - 1   # mut_train_DepMus
+    train = d.iloc[train_idx].dropna(subset=["Age", "Primary streaming service", "fav"])
+    services = sorted(d["Primary streaming service"].dropna().unique())      # R factor levels; first = reference
+    terms = ["(Intercept)", "Age"] + CONDS + [f"service: {s}" for s in services[1:]]
 
-    def design(frame, mean=None, scale=None):
-        num = frame[numeric].astype(float).to_numpy()
-        if mean is None:
-            mean, scale = num.mean(0), num.std(0)
-        Xn = (num - mean) / scale
-        Xs = np.column_stack([(frame["Primary streaming service"] == s).astype(float) for s in services])
-        return np.column_stack([Xn, Xs]), mean, scale
+    def design(frame):
+        return np.column_stack([np.ones(len(frame)), frame[["Age"] + CONDS].to_numpy(float)]
+                               + [(frame["Primary streaming service"] == s).astype(float) for s in services[1:]])
 
-    need = numeric + ["Primary streaming service", "fav"]
-    train = d.iloc[train_idx].dropna(subset=need)   # multinom drops rows with NA
-    test = d.iloc[test_idx].dropna(subset=need)
-    Xtr, mean, scale = design(train)
-    Xte, _, _ = design(test, mean, scale)
-    # Light L2 keeps coefficients finite for genres with only a handful of fans (e.g. Latin, Gospel)
-    m = LogisticRegression(C=10, max_iter=5000).fit(Xtr, train["fav"])
-    classes = list(m.classes_)
+    X = design(train)
+    classes = sorted(train["fav"].unique())
+    K, P = len(classes), X.shape[1]
+    Y = np.zeros((len(train), K))
+    Y[np.arange(len(train)), [classes.index(c) for c in train["fav"]]] = 1
+
+    def nll(w):
+        W = np.vstack([np.zeros(P), w.reshape(K - 1, P)])
+        Z = X @ W.T
+        Z -= Z.max(1, keepdims=True)
+        lp = Z - np.log(np.exp(Z).sum(1, keepdims=True))
+        return -(Y * lp).sum(), ((np.exp(lp) - Y)[:, 1:].T @ X).ravel()
+
+    fit = minimize(nll, np.zeros((K - 1) * P), jac=True, method="BFGS", options={"maxiter": 100})
+    W = np.vstack([np.zeros(P), fit.x.reshape(K - 1, P)])
+
+    # Wald standard errors from the Hessian (as summary()/tidy() on a multinom fit)
+    Z = X @ W.T
+    Z -= Z.max(1, keepdims=True)
+    Pr = np.exp(Z)
+    Pr /= Pr.sum(1, keepdims=True)
+    H = np.zeros(((K - 1) * P, (K - 1) * P))
+    for i in range(len(X)):
+        pi = Pr[i, 1:]
+        H += np.kron(np.diag(pi) - np.outer(pi, pi), np.outer(X[i], X[i]))
+    with np.errstate(invalid="ignore"):
+        se = np.sqrt(np.diag(np.linalg.pinv(H)))
+        pvals = 2 * (1 - norm.cdf(np.abs(fit.x / se)))
+    pvals = np.nan_to_num(pvals, nan=1.0).reshape(K - 1, P)
+
+    table = []   # the tidy() table from the '## Model' section: y.level, term, estimate, p.value
+    for k in range(1, K):
+        for j in range(P):
+            table.append({"level": classes[k], "term": terms[j], "estimate": r(W[k, j], 4), "p": r(pvals[k - 1, j], 4)})
     base = train["fav"].value_counts(normalize=True).reindex(classes).fillna(0)
-    probs = m.predict_proba(Xte)
-    acc = float((m.predict(Xte) == test["fav"].to_numpy()).mean())
-    majority = base.idxmax()
-    maj_acc = float((test["fav"] == majority).mean())
-    ll = log_loss(test["fav"], probs, labels=classes)
-    ll_base = log_loss(test["fav"], np.tile(base.to_numpy(), (len(test), 1)), labels=classes)
     model = {
         "name": "Truman's favorite-genre model",
-        "source": "Music_predictor_Truman.qmd (fit_mutDepMus2), refit in Python with the same predictors and "
-                  "set.seed(101) 85% training split",
+        "source": "Music_predictor_Truman.qmd, ## Model: fit_mutDepMus2 (multinomial logistic regression)",
+        "formula": "Fav genre ~ Age + Anxiety + Depression + Insomnia + OCD + Primary streaming service",
+        "reference": classes[0],
         "classes": classes,
-        "numeric": numeric,
-        "mean": [r(v, 4) for v in mean],
-        "scale": [r(v, 4) for v in scale],
-        "services": services,
-        "coef": [[r(v) for v in row] for row in m.coef_],
-        "intercept": [r(v) for v in m.intercept_],
+        "terms": terms,
+        "services": services,             # services[0] is the reference level (no dummy)
+        "W": [[r(v) for v in row] for row in W],   # one row per class (reference row = 0), columns = terms
+        "table": table,
         "base": {c: r(base[c], 4) for c in classes},
+        "n": int(len(train)),
         "ageDefault": int(d["Age"].median()),
-        "test": {"n": int(len(test)), "accuracy": r(acc, 3), "majorityClass": majority,
-                 "majorityAccuracy": r(maj_acc, 3), "logLoss": r(ll, 3), "baseLogLoss": r(ll_base, 3)},
     }
     (OUT / "truman_model.json").write_text(json.dumps(model, indent=1))
-    print(f"truman: {len(classes)} classes, train n={len(train)}, test acc {acc:.3f} vs always-'{majority}' {maj_acc:.3f}, "
-          f"log loss {ll:.3f} vs base {ll_base:.3f}")
+    sig = [t for t in table if t["p"] < 0.05 and t["term"] != "(Intercept)"]
+    print(f"truman: {K} classes, n={len(train)}, BFGS iters {fit.nit}, significant terms: "
+          + "; ".join(f"{t['level']} ~ {t['term']} {t['estimate']:+.3f} (p={t['p']:.3f})" for t in sig))
 
 
 # ------------------------------------------------------------------ Python notebook

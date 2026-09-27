@@ -1,6 +1,8 @@
 {
  "name": "Truman's favorite-genre model",
- "source": "Music_predictor_Truman.qmd (fit_mutDepMus2), refit in Python with the same predictors and set.seed(101) 85% training split",
+ "source": "Music_predictor_Truman.qmd, ## Model: fit_mutDepMus2 (multinomial logistic regression)",
+ "formula": "Fav genre ~ Age + Anxiety + Depression + Insomnia + OCD + Primary streaming service",
+ "reference": "Classical",
  "classes": [
   "Classical",
   "Country",
@@ -16,26 +18,18 @@
   "Rock & Metal",
   "Video game music"
  ],
- "numeric": [
+ "terms": [
+  "(Intercept)",
   "Age",
   "Anxiety",
   "Depression",
   "Insomnia",
-  "OCD"
- ],
- "mean": [
-  24.9486,
-  5.7809,
-  4.74,
-  3.7279,
-  2.6533
- ],
- "scale": [
-  11.7396,
-  2.8029,
-  3.0267,
-  3.0938,
-  2.8717
+  "OCD",
+  "service: I do not use a streaming service.",
+  "service: Other streaming service",
+  "service: Pandora",
+  "service: Spotify",
+  "service: YouTube Music"
  ],
  "services": [
   "Apple Music",
@@ -45,191 +39,970 @@
   "Spotify",
   "YouTube Music"
  ],
- "coef": [
+ "W": [
   [
-   0.14473,
-   -0.1884,
-   0.08034,
-   0.05295,
-   0.05831,
-   -0.21053,
-   1.19016,
-   -0.96835,
-   0.67288,
-   -0.91178,
-   0.2384
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
   ],
   [
-   -0.16649,
-   -0.19454,
-   0.10794,
-   -0.61451,
-   0.33891,
-   1.26907,
-   -1.30581,
-   0.03164,
-   -0.48659,
-   0.19311,
-   0.3487
+   0.96401,
+   -0.02496,
+   -0.00369,
+   0.00979,
+   -0.21959,
+   0.09956,
+   -9.02521,
+   -0.54235,
+   -6.09263,
+   -0.47407,
+   -1.4603
   ],
   [
-   -0.32804,
-   -0.17659,
-   0.40484,
-   -0.02485,
-   0.27595,
-   0.50447,
-   -0.11525,
-   0.40338,
-   -0.71745,
-   -0.51164,
-   0.4565
+   0.51436,
+   -0.03958,
+   0.00336,
+   0.10894,
+   -0.02606,
+   0.07605,
+   -2.1341,
+   0.64703,
+   -5.72281,
+   -0.38495,
+   -0.56864
   ],
   [
-   0.47937,
-   0.8366,
-   0.12591,
-   -0.32991,
-   -0.29032,
-   -0.42836,
-   0.16614,
-   0.28138,
-   -1.10423,
-   0.24086,
-   0.89751
+   -3.6882,
+   0.02991,
+   0.36872,
+   0.01541,
+   -0.12541,
+   -0.12335,
+   -0.84269,
+   1.48607,
+   -5.20722,
+   1.34881,
+   0.85955
   ],
   [
-   1.40854,
-   0.44145,
-   -0.96506,
-   0.89315,
-   -1.6463,
-   -0.88674,
-   0.07902,
-   -1.25626,
-   1.82653,
-   0.3363,
-   0.05279
+   -10.34656,
+   0.11308,
+   0.23718,
+   -0.37643,
+   0.28387,
+   -0.80203,
+   1.64671,
+   -3.91425,
+   3.9724,
+   4.07296,
+   2.50972
   ],
   [
-   -0.21419,
-   -0.13832,
-   0.41408,
-   -0.41649,
-   0.22792,
-   0.74388,
-   -1.96769,
-   0.49016,
-   1.35649,
-   -0.19797,
-   -0.39749
+   1.13363,
+   -0.03068,
+   0.0163,
+   0.11077,
+   -0.15156,
+   0.05899,
+   -9.58746,
+   0.4891,
+   -0.27087,
+   -0.3114,
+   -1.68563
   ],
   [
-   0.3891,
-   0.45576,
-   -0.10951,
-   -0.19567,
-   0.17173,
-   -1.33541,
-   -1.0722,
-   1.51935,
-   -0.5897,
-   0.78337,
-   0.78967
+   -8.01427,
+   0.02258,
+   0.23448,
+   -0.06112,
+   -0.08416,
+   0.03914,
+   -3.65417,
+   7.08686,
+   -1.93999,
+   6.21398,
+   5.08099
   ],
   [
-   -1.82554,
-   -1.59603,
-   -1.05809,
-   0.80406,
-   0.32138,
-   -0.37427,
-   -0.17962,
-   -0.53586,
-   0.00394,
-   1.31626,
-   -0.74872
+   1.1371,
+   -0.38046,
+   -0.7085,
+   -0.53923,
+   0.32293,
+   0.04797,
+   -0.4206,
+   -0.34558,
+   0.10013,
+   5.38499,
+   -2.66012
   ],
   [
-   -0.04018,
-   -0.34029,
-   0.85462,
-   0.3555,
-   0.26096,
-   1.0409,
-   -0.78787,
-   0.85145,
-   -0.20343,
-   0.50256,
-   -1.33638
+   -2.38411,
+   -0.0152,
+   -0.06237,
+   0.26229,
+   0.09877,
+   0.07185,
+   -7.38426,
+   0.47531,
+   -3.98579,
+   -0.01777,
+   -6.92009
   ],
   [
-   -0.04323,
-   0.30428,
-   0.06285,
-   -0.20866,
-   0.0778,
-   0.44526,
-   0.926,
-   -0.25111,
-   -1.41948,
-   -0.16487,
-   0.48855
+   0.97215,
+   -0.01535,
+   0.17646,
+   -0.00548,
+   -0.08526,
+   0.00641,
+   -0.99946,
+   0.03548,
+   -7.5049,
+   0.02462,
+   -0.48291
   ],
   [
-   0.23279,
-   0.0682,
-   -0.1346,
-   -0.39231,
-   0.25872,
-   0.42898,
-   0.09204,
-   -0.10414,
-   1.4553,
-   -0.48245,
-   -1.3691
+   0.19318,
+   0.00689,
+   0.09012,
+   -0.07188,
+   -0.14297,
+   0.07021,
+   -1.80921,
+   0.20436,
+   0.12082,
+   -0.28342,
+   -2.47248
   ],
   [
-   0.4644,
-   0.21859,
-   0.28656,
-   -0.06529,
-   0.04538,
-   -0.19952,
-   0.92189,
-   -0.39369,
-   -0.15666,
-   -0.1615,
-   -0.03224
+   -0.30681,
+   0.02762,
+   0.14582,
+   0.06842,
+   -0.03839,
+   -0.00509,
+   -0.34511,
+   0.55181,
+   -0.95983,
+   0.6869,
+   -0.34305
   ],
   [
-   -0.50126,
-   0.3093,
-   -0.06988,
-   0.14204,
-   -0.10045,
-   -0.99774,
-   2.05319,
-   -0.06796,
-   -0.63761,
-   -0.94224,
-   0.61182
+   -0.71593,
+   -0.05511,
+   0.17888,
+   -0.049,
+   0.02857,
+   -0.05538,
+   1.67329,
+   1.75017,
+   -2.99774,
+   0.77019,
+   1.16958
   ]
  ],
- "intercept": [
-  1.64205,
-  -0.12653,
-  1.02133,
-  0.3077,
-  -3.90521,
-  1.19552,
-  -0.44516,
-  -5.99639,
-  -1.11322,
-  2.19956,
-  1.13178,
-  2.96866,
-  1.11991
+ "table": [
+  {
+   "level": "Country",
+   "term": "(Intercept)",
+   "estimate": 0.964,
+   "p": 0.452
+  },
+  {
+   "level": "Country",
+   "term": "Age",
+   "estimate": -0.025,
+   "p": 0.4521
+  },
+  {
+   "level": "Country",
+   "term": "Anxiety",
+   "estimate": -0.0037,
+   "p": 0.9762
+  },
+  {
+   "level": "Country",
+   "term": "Depression",
+   "estimate": 0.0098,
+   "p": 0.9307
+  },
+  {
+   "level": "Country",
+   "term": "Insomnia",
+   "estimate": -0.2196,
+   "p": 0.0558
+  },
+  {
+   "level": "Country",
+   "term": "OCD",
+   "estimate": 0.0996,
+   "p": 0.3584
+  },
+  {
+   "level": "Country",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -9.0252,
+   "p": 0.7777
+  },
+  {
+   "level": "Country",
+   "term": "service: Other streaming service",
+   "estimate": -0.5423,
+   "p": 0.7178
+  },
+  {
+   "level": "Country",
+   "term": "service: Pandora",
+   "estimate": -6.0926,
+   "p": 0.8034
+  },
+  {
+   "level": "Country",
+   "term": "service: Spotify",
+   "estimate": -0.4741,
+   "p": 0.6031
+  },
+  {
+   "level": "Country",
+   "term": "service: YouTube Music",
+   "estimate": -1.4603,
+   "p": 0.2054
+  },
+  {
+   "level": "EDM",
+   "term": "(Intercept)",
+   "estimate": 0.5144,
+   "p": 0.655
+  },
+  {
+   "level": "EDM",
+   "term": "Age",
+   "estimate": -0.0396,
+   "p": 0.1661
+  },
+  {
+   "level": "EDM",
+   "term": "Anxiety",
+   "estimate": 0.0034,
+   "p": 0.9749
+  },
+  {
+   "level": "EDM",
+   "term": "Depression",
+   "estimate": 0.1089,
+   "p": 0.251
+  },
+  {
+   "level": "EDM",
+   "term": "Insomnia",
+   "estimate": -0.0261,
+   "p": 0.7546
+  },
+  {
+   "level": "EDM",
+   "term": "OCD",
+   "estimate": 0.076,
+   "p": 0.394
+  },
+  {
+   "level": "EDM",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -2.1341,
+   "p": 0.1087
+  },
+  {
+   "level": "EDM",
+   "term": "service: Other streaming service",
+   "estimate": 0.647,
+   "p": 0.5841
+  },
+  {
+   "level": "EDM",
+   "term": "service: Pandora",
+   "estimate": -5.7228,
+   "p": 0.7941
+  },
+  {
+   "level": "EDM",
+   "term": "service: Spotify",
+   "estimate": -0.385,
+   "p": 0.6494
+  },
+  {
+   "level": "EDM",
+   "term": "service: YouTube Music",
+   "estimate": -0.5686,
+   "p": 0.5494
+  },
+  {
+   "level": "Folk",
+   "term": "(Intercept)",
+   "estimate": -3.6882,
+   "p": 0.0164
+  },
+  {
+   "level": "Folk",
+   "term": "Age",
+   "estimate": 0.0299,
+   "p": 0.1799
+  },
+  {
+   "level": "Folk",
+   "term": "Anxiety",
+   "estimate": 0.3687,
+   "p": 0.0017
+  },
+  {
+   "level": "Folk",
+   "term": "Depression",
+   "estimate": 0.0154,
+   "p": 0.8814
+  },
+  {
+   "level": "Folk",
+   "term": "Insomnia",
+   "estimate": -0.1254,
+   "p": 0.1762
+  },
+  {
+   "level": "Folk",
+   "term": "OCD",
+   "estimate": -0.1234,
+   "p": 0.2357
+  },
+  {
+   "level": "Folk",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -0.8427,
+   "p": 0.5959
+  },
+  {
+   "level": "Folk",
+   "term": "service: Other streaming service",
+   "estimate": 1.4861,
+   "p": 0.3398
+  },
+  {
+   "level": "Folk",
+   "term": "service: Pandora",
+   "estimate": -5.2072,
+   "p": 0.764
+  },
+  {
+   "level": "Folk",
+   "term": "service: Spotify",
+   "estimate": 1.3488,
+   "p": 0.2699
+  },
+  {
+   "level": "Folk",
+   "term": "service: YouTube Music",
+   "estimate": 0.8595,
+   "p": 0.5102
+  },
+  {
+   "level": "Gospel",
+   "term": "(Intercept)",
+   "estimate": -10.3466,
+   "p": 0.3377
+  },
+  {
+   "level": "Gospel",
+   "term": "Age",
+   "estimate": 0.1131,
+   "p": 0.0043
+  },
+  {
+   "level": "Gospel",
+   "term": "Anxiety",
+   "estimate": 0.2372,
+   "p": 0.3325
+  },
+  {
+   "level": "Gospel",
+   "term": "Depression",
+   "estimate": -0.3764,
+   "p": 0.1743
+  },
+  {
+   "level": "Gospel",
+   "term": "Insomnia",
+   "estimate": 0.2839,
+   "p": 0.1498
+  },
+  {
+   "level": "Gospel",
+   "term": "OCD",
+   "estimate": -0.802,
+   "p": 0.2726
+  },
+  {
+   "level": "Gospel",
+   "term": "service: I do not use a streaming service.",
+   "estimate": 1.6467,
+   "p": 0.8768
+  },
+  {
+   "level": "Gospel",
+   "term": "service: Other streaming service",
+   "estimate": -3.9142,
+   "p": 0.9582
+  },
+  {
+   "level": "Gospel",
+   "term": "service: Pandora",
+   "estimate": 3.9724,
+   "p": 0.707
+  },
+  {
+   "level": "Gospel",
+   "term": "service: Spotify",
+   "estimate": 4.073,
+   "p": 0.7005
+  },
+  {
+   "level": "Gospel",
+   "term": "service: YouTube Music",
+   "estimate": 2.5097,
+   "p": 0.8128
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "(Intercept)",
+   "estimate": 1.1336,
+   "p": 0.288
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "Age",
+   "estimate": -0.0307,
+   "p": 0.2225
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "Anxiety",
+   "estimate": 0.0163,
+   "p": 0.8685
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "Depression",
+   "estimate": 0.1108,
+   "p": 0.2111
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "Insomnia",
+   "estimate": -0.1516,
+   "p": 0.0622
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "OCD",
+   "estimate": 0.059,
+   "p": 0.4912
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -9.5875,
+   "p": 0.7719
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "service: Other streaming service",
+   "estimate": 0.4891,
+   "p": 0.6633
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "service: Pandora",
+   "estimate": -0.2709,
+   "p": 0.8742
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "service: Spotify",
+   "estimate": -0.3114,
+   "p": 0.691
+  },
+  {
+   "level": "Hip hop & Rap",
+   "term": "service: YouTube Music",
+   "estimate": -1.6856,
+   "p": 0.0897
+  },
+  {
+   "level": "Jazz",
+   "term": "(Intercept)",
+   "estimate": -8.0143,
+   "p": 0.5819
+  },
+  {
+   "level": "Jazz",
+   "term": "Age",
+   "estimate": 0.0226,
+   "p": 0.3887
+  },
+  {
+   "level": "Jazz",
+   "term": "Anxiety",
+   "estimate": 0.2345,
+   "p": 0.0683
+  },
+  {
+   "level": "Jazz",
+   "term": "Depression",
+   "estimate": -0.0611,
+   "p": 0.603
+  },
+  {
+   "level": "Jazz",
+   "term": "Insomnia",
+   "estimate": -0.0842,
+   "p": 0.4121
+  },
+  {
+   "level": "Jazz",
+   "term": "OCD",
+   "estimate": 0.0391,
+   "p": 0.7143
+  },
+  {
+   "level": "Jazz",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -3.6542,
+   "p": 0.9488
+  },
+  {
+   "level": "Jazz",
+   "term": "service: Other streaming service",
+   "estimate": 7.0869,
+   "p": 0.6261
+  },
+  {
+   "level": "Jazz",
+   "term": "service: Pandora",
+   "estimate": -1.94,
+   "p": 0.9716
+  },
+  {
+   "level": "Jazz",
+   "term": "service: Spotify",
+   "estimate": 6.214,
+   "p": 0.6687
+  },
+  {
+   "level": "Jazz",
+   "term": "service: YouTube Music",
+   "estimate": 5.081,
+   "p": 0.7267
+  },
+  {
+   "level": "Latin",
+   "term": "(Intercept)",
+   "estimate": 1.1371,
+   "p": 0.9621
+  },
+  {
+   "level": "Latin",
+   "term": "Age",
+   "estimate": -0.3805,
+   "p": 0.2228
+  },
+  {
+   "level": "Latin",
+   "term": "Anxiety",
+   "estimate": -0.7085,
+   "p": 0.1614
+  },
+  {
+   "level": "Latin",
+   "term": "Depression",
+   "estimate": -0.5392,
+   "p": 0.3574
+  },
+  {
+   "level": "Latin",
+   "term": "Insomnia",
+   "estimate": 0.3229,
+   "p": 0.2436
+  },
+  {
+   "level": "Latin",
+   "term": "OCD",
+   "estimate": 0.048,
+   "p": 0.8711
+  },
+  {
+   "level": "Latin",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -0.4206,
+   "p": 0.9916
+  },
+  {
+   "level": "Latin",
+   "term": "service: Other streaming service",
+   "estimate": -0.3456,
+   "p": 0.9936
+  },
+  {
+   "level": "Latin",
+   "term": "service: Pandora",
+   "estimate": 0.1001,
+   "p": 1.0
+  },
+  {
+   "level": "Latin",
+   "term": "service: Spotify",
+   "estimate": 5.385,
+   "p": 0.8175
+  },
+  {
+   "level": "Latin",
+   "term": "service: YouTube Music",
+   "estimate": -2.6601,
+   "p": 0.9353
+  },
+  {
+   "level": "Lofi",
+   "term": "(Intercept)",
+   "estimate": -2.3841,
+   "p": 0.209
+  },
+  {
+   "level": "Lofi",
+   "term": "Age",
+   "estimate": -0.0152,
+   "p": 0.7458
+  },
+  {
+   "level": "Lofi",
+   "term": "Anxiety",
+   "estimate": -0.0624,
+   "p": 0.7098
+  },
+  {
+   "level": "Lofi",
+   "term": "Depression",
+   "estimate": 0.2623,
+   "p": 0.0977
+  },
+  {
+   "level": "Lofi",
+   "term": "Insomnia",
+   "estimate": 0.0988,
+   "p": 0.4323
+  },
+  {
+   "level": "Lofi",
+   "term": "OCD",
+   "estimate": 0.0718,
+   "p": 0.5803
+  },
+  {
+   "level": "Lofi",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -7.3843,
+   "p": 0.7754
+  },
+  {
+   "level": "Lofi",
+   "term": "service: Other streaming service",
+   "estimate": 0.4753,
+   "p": 0.785
+  },
+  {
+   "level": "Lofi",
+   "term": "service: Pandora",
+   "estimate": -3.9858,
+   "p": 0.8133
+  },
+  {
+   "level": "Lofi",
+   "term": "service: Spotify",
+   "estimate": -0.0178,
+   "p": 0.9887
+  },
+  {
+   "level": "Lofi",
+   "term": "service: YouTube Music",
+   "estimate": -6.9201,
+   "p": 0.7133
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "(Intercept)",
+   "estimate": 0.9722,
+   "p": 0.2809
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "Age",
+   "estimate": -0.0154,
+   "p": 0.3797
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "Anxiety",
+   "estimate": 0.1765,
+   "p": 0.0323
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "Depression",
+   "estimate": -0.0055,
+   "p": 0.9418
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "Insomnia",
+   "estimate": -0.0853,
+   "p": 0.1877
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "OCD",
+   "estimate": 0.0064,
+   "p": 0.9292
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -0.9995,
+   "p": 0.2238
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "service: Other streaming service",
+   "estimate": 0.0355,
+   "p": 0.9734
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "service: Pandora",
+   "estimate": -7.5049,
+   "p": 0.7615
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "service: Spotify",
+   "estimate": 0.0246,
+   "p": 0.9724
+  },
+  {
+   "level": "Pop & K-pop",
+   "term": "service: YouTube Music",
+   "estimate": -0.4829,
+   "p": 0.5378
+  },
+  {
+   "level": "R&B",
+   "term": "(Intercept)",
+   "estimate": 0.1932,
+   "p": 0.8632
+  },
+  {
+   "level": "R&B",
+   "term": "Age",
+   "estimate": 0.0069,
+   "p": 0.7477
+  },
+  {
+   "level": "R&B",
+   "term": "Anxiety",
+   "estimate": 0.0901,
+   "p": 0.4065
+  },
+  {
+   "level": "R&B",
+   "term": "Depression",
+   "estimate": -0.0719,
+   "p": 0.4834
+  },
+  {
+   "level": "R&B",
+   "term": "Insomnia",
+   "estimate": -0.143,
+   "p": 0.1172
+  },
+  {
+   "level": "R&B",
+   "term": "OCD",
+   "estimate": 0.0702,
+   "p": 0.455
+  },
+  {
+   "level": "R&B",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -1.8092,
+   "p": 0.1065
+  },
+  {
+   "level": "R&B",
+   "term": "service: Other streaming service",
+   "estimate": 0.2044,
+   "p": 0.8667
+  },
+  {
+   "level": "R&B",
+   "term": "service: Pandora",
+   "estimate": 0.1208,
+   "p": 0.9383
+  },
+  {
+   "level": "R&B",
+   "term": "service: Spotify",
+   "estimate": -0.2834,
+   "p": 0.7377
+  },
+  {
+   "level": "R&B",
+   "term": "service: YouTube Music",
+   "estimate": -2.4725,
+   "p": 0.061
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "(Intercept)",
+   "estimate": -0.3068,
+   "p": 0.7242
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "Age",
+   "estimate": 0.0276,
+   "p": 0.0599
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "Anxiety",
+   "estimate": 0.1458,
+   "p": 0.0602
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "Depression",
+   "estimate": 0.0684,
+   "p": 0.335
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "Insomnia",
+   "estimate": -0.0384,
+   "p": 0.5203
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "OCD",
+   "estimate": -0.0051,
+   "p": 0.9407
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "service: I do not use a streaming service.",
+   "estimate": -0.3451,
+   "p": 0.659
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "service: Other streaming service",
+   "estimate": 0.5518,
+   "p": 0.5881
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "service: Pandora",
+   "estimate": -0.9598,
+   "p": 0.4947
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "service: Spotify",
+   "estimate": 0.6869,
+   "p": 0.3297
+  },
+  {
+   "level": "Rock & Metal",
+   "term": "service: YouTube Music",
+   "estimate": -0.3431,
+   "p": 0.6571
+  },
+  {
+   "level": "Video game music",
+   "term": "(Intercept)",
+   "estimate": -0.7159,
+   "p": 0.613
+  },
+  {
+   "level": "Video game music",
+   "term": "Age",
+   "estimate": -0.0551,
+   "p": 0.0453
+  },
+  {
+   "level": "Video game music",
+   "term": "Anxiety",
+   "estimate": 0.1789,
+   "p": 0.082
+  },
+  {
+   "level": "Video game music",
+   "term": "Depression",
+   "estimate": -0.049,
+   "p": 0.6052
+  },
+  {
+   "level": "Video game music",
+   "term": "Insomnia",
+   "estimate": 0.0286,
+   "p": 0.7223
+  },
+  {
+   "level": "Video game music",
+   "term": "OCD",
+   "estimate": -0.0554,
+   "p": 0.545
+  },
+  {
+   "level": "Video game music",
+   "term": "service: I do not use a streaming service.",
+   "estimate": 1.6733,
+   "p": 0.1816
+  },
+  {
+   "level": "Video game music",
+   "term": "service: Other streaming service",
+   "estimate": 1.7502,
+   "p": 0.2382
+  },
+  {
+   "level": "Video game music",
+   "term": "service: Pandora",
+   "estimate": -2.9977,
+   "p": 0.8288
+  },
+  {
+   "level": "Video game music",
+   "term": "service: Spotify",
+   "estimate": 0.7702,
+   "p": 0.5233
+  },
+  {
+   "level": "Video game music",
+   "term": "service: YouTube Music",
+   "estimate": 1.1696,
+   "p": 0.3525
+  }
  ],
  "base": {
   "Classical": 0.0706,
@@ -246,13 +1019,6 @@
   "Rock & Metal": 0.3676,
   "Video game music": 0.0594
  },
- "ageDefault": 21,
- "test": {
-  "n": 111,
-  "accuracy": 0.387,
-  "majorityClass": "Rock & Metal",
-  "majorityAccuracy": 0.423,
-  "logLoss": 2.076,
-  "baseLogLoss": 1.902
- }
+ "n": 623,
+ "ageDefault": 21
 }
