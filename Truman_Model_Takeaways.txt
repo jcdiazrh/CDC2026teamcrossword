@@ -1,0 +1,14 @@
+Using the data, I looked to predict an individuals favorite genre based on the variables given.
+
+I initially checked GVIF for all the variables not counting frequency stats finding
+little  evidence for multicollinearity between the variables
+
+Then looking at a confusion matrix of the predictions vs. truth that my model was making
+I saw spots of Rock and metal being predicted often as eachother, and also thought to combine hip-hop and rap, 
+and kpop and pop.
+
+The new model was predicting everything as Rock, so will have the app display where a given person sits compared to baseline.
+
+Comparing AIC between all the models gave me all similar numbers, so chose fit_mutDepMus2 with the lowest AIC and simple 
+questions for our predictions.
+
