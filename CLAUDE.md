@@ -12,14 +12,21 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
    overlaid on the whole-survey average, plus a "% say music improves their mental health" callout
 
 4. **Feelings → Music** (dark mode, slide switch at the top, no login): 4 score sliders, plus a model slide inside the page:
-   - **Truman's model** (default; `Music_predictor_Truman.qmd`, final `fit_mutDepMus2`): multinom Fav genre (13 merged classes)
-     ~ Age + 4 scores + streaming service, so the page also asks age + service. Refit in Python (light L2, C=10) on the
-     same set.seed(101) 85% split (`web/scripts/r_sample.py` reproduces R's sampler) → `web/src/data/truman_model.json`.
-     Held-out accuracy 39% vs 42% always-Rock: the UI says so honestly.
+   - **Truman's model** (default): **only the `## Model` section of `Music_predictor_Truman.qmd` counts** (team's call):
+     `fit_mutDepMus2` = multinom(Fav genre [13 merged classes] ~ Age + 4 scores + streaming service), so the page also asks
+     age + service. Fitted like nnet::multinom (no regularization, BFGS from 0, maxit 100) on mut_train (set.seed(101) 85%;
+     `web/scripts/r_sample.py` reproduces R's sampler) → `web/src/data/truman_model.json`, incl. its tidy() table (Wald p-values).
+     The page lists the p < 0.05 effects (Anxiety→Folk, Anxiety→Pop & K-pop, Age→Gospel, Age→VGM). Don't pull in the
+     qmd's other sections (confusion matrices, reweighting) without asking.
    - **Python model** (`python notebook/notebook.ipynb`, `music_genre_model.joblib`): 13 correlation-clustered genre groups,
      one logistic regression each on the standardized 4 scores, P(listens at all, i.e. not "Never"). Exported exactly
      → `web/src/data/python_model.json`. Reported macro AUC 0.519 vs 0.453 baseline, permutation p < 0.001.
    - Headline = the option most over-represented for the user (lift vs base rate); the page also shows the most likely one.
+   - **Radar shows multipliers (lift = p / survey base rate), not percentages**, with a solid red ring at 1× (team feedback).
+     Truman's radar is 0–3× (values above 3× are drawn at the edge as triangles; tooltip shows the real value); Python's zooms
+     to its spread. Truman's platform choices: YouTube Music, Apple Music, Spotify, Pandora, Other.
+   - "Play Spotify's Top 100 <genre>" button (and ▶ on each lift row) opens Spotify's playlist search for that genre's
+     top-100 lists (page has no login, so it's a search link, not an API call).
    - Build both: `npm run feelings-models`
 
 ## Decisions already agreed with the team (don't undo without asking)
@@ -46,7 +53,7 @@ Receiptify-style: log in with Spotify → read top 50 artists (4 weeks / **6 mon
 - `npm run check`: runs the pipeline (genre mapping → profile → both models) on mock listeners
 - `npm run build`, `npm run lint`
 - `npm run data`: regenerate `src/data/survey.json` from the CSV (needs pandas + numpy)
-- `npm run feelings-models`: rebuild `truman_model.json` + `python_model.json` (pandas, scikit-learn, joblib)
+- `npm run feelings-models`: rebuild `truman_model.json` + `python_model.json` (pandas, scipy, scikit-learn, joblib)
 - `npm run model`: rebuild `src/data/r_model.json` (from `r_coefficients.csv` if present; the Python refit needs statsmodels)
 
 ## Open ideas / next steps

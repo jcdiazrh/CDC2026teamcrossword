@@ -29,7 +29,7 @@ export const palette = (dark) => (dark ? CD : C)
 const FONT = "'DM Sans Variable', system-ui, sans-serif"
 const DISPLAY = "'Bricolage Grotesque Variable', 'DM Sans Variable', system-ui, sans-serif"
 
-export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle = 0, showTicks = true, labelSize = 13, pointRadius = 5, dark = false }) {
+export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle = 0, showTicks = true, labelSize = 13, pointRadius = 5, dark = false, min = 0, tickFormat = null, tooltipFilter = null }) {
   const P = palette(dark)
   return {
     responsive: true,
@@ -40,9 +40,9 @@ export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle
     scales: {
       r: {
         startAngle,
-        min: 0,
+        min,
         max,
-        ticks: { stepSize: step, display: showTicks, backdropColor: 'transparent', color: P.ink2, font: { family: FONT, size: 10 }, z: 1 },
+        ticks: { stepSize: step, display: showTicks, ...(tickFormat && { callback: tickFormat }), backdropColor: 'transparent', color: P.ink2, font: { family: FONT, size: 10 }, z: 1 },
         grid: { color: P.grid, lineWidth: 1.5 },
         angleLines: { color: P.grid, lineWidth: 1.5 },
         pointLabels: { color: P.ink, font: { family: DISPLAY, size: labelSize, weight: 700 }, padding: labelSize < 13 ? 5 : 8 },
@@ -58,6 +58,7 @@ export function radarOptions({ max, step, tooltipLabel, tooltipTitle, startAngle
         cornerRadius: 12,
         boxPadding: 6,
         usePointStyle: true,
+        ...(tooltipFilter && { filter: tooltipFilter }),
         callbacks: { label: tooltipLabel, ...(tooltipTitle && { title: tooltipTitle }) },
       },
     },

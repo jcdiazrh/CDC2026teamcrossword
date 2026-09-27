@@ -14,11 +14,12 @@ Log in with Spotify, and the app reads your top 50 artists and gives you:
 - **Music → Feelings** (light): the Spotify flow below
 - **Feelings → Music** (dark, no login needed): slide your anxiety, depression, insomnia, and OCD (0–10) and the app
   guesses your music taste. A second slide inside the page picks the model:
-  - **Truman's model** (default, `Music_predictor_Truman.qmd`): multinomial model of your *favorite genre* from age,
-    the 4 scores and streaming service (Rock+Metal, Pop+K pop, Hip hop+Rap merged)
+  - **Truman's model** (default): `fit_mutDepMus2` from the `## Model` section of `Music_predictor_Truman.qmd`, a multinomial
+    model of your *favorite genre* from age, the 4 scores and streaming service (Rock+Metal, Pop+K pop, Hip hop+Rap merged),
+    with its significant (p < 0.05) effects listed on the page
   - **Python model** (`python notebook/notebook.ipynb` → `music_genre_model.joblib`): the chance you listen to each of
     the notebook's 13 genre clusters, from the 4 scores
-  `#feelings` in the URL opens it directly. Rebuild both with `npm run feelings-models` (pandas, scikit-learn, joblib).
+  `#feelings` in the URL opens it directly. Rebuild both with `npm run feelings-models` (pandas, scipy, scikit-learn, joblib).
 
 The genre charts use **13 categories**: the survey's 16 with Hip hop + Rap, Pop + K pop, and Rock + Metal merged
 (`src/lib/groups.js`). The models still use all 16 underneath.
@@ -95,7 +96,7 @@ Anxiety / Depression / Insomnia / OCD (0–10) → second radar
 | `src/model/index.js` | **Model registry**: `ACTIVE_MODEL = 'team'` |
 | `src/model/linear.js` | The team regression (binary genre coding), significant effects, fit notes |
 | `src/model/feelingsModels.js` | Feelings → Music: runs Truman's model (softmax) and the Python notebook model (13 logistic regressions) |
-| `scripts/build_feelings_models.py` | Builds `truman_model.json` (refit, same predictors + same R seed-101 split) and `python_model.json` (exported from the joblib) |
+| `scripts/build_feelings_models.py` | Builds `truman_model.json` (fit_mutDepMus2 fitted like nnet::multinom, plus its p-value table) and `python_model.json` (exported from the joblib) |
 | `scripts/r_sample.py` | Python copy of R's `set.seed()` + `sample()` to reproduce the team's R splits |
 | `src/lib/groups.js` | The 13 display groups (merged pairs) |
 | `src/model/knn.js` | Alternative "listeners like you" model (switchable in *Under the hood*) |
