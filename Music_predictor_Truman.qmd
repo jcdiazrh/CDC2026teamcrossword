@@ -127,7 +127,7 @@ tidy(pred_obj) |>
 
 Ok, pivoting towards finding what vars we can remove and then reweighting
 
-Comparing BIC of just the 4 OCD, Anxiety, Depression, Insomnia and then adding vars
+Comparing AIC of just the 4 OCD, Anxiety, Depression, Insomnia and then adding vars
 
 ```{r}
 fit_mutDepMus1 <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD, mut_train_DepMus)
@@ -141,49 +141,9 @@ fit_mutDepMus4 <- multinom(Fav.genre~Age+Anxiety+Depression+Insomnia+OCD+Primary
 
 AIC(fit_mutDepMus, fit_mutDepMus1, fit_mutDepMus2, fit_mutDepMus3, fit_mutDepMus4)
 
-
 ```
 
-Hmm, they're basically all similar, but what if I re-weight?
-
-```{r}
-#thanks claude
-
-class_counts <- table(mut_train_DepMus$Fav.genre)
-inv_freq <- 1 / class_counts  # base weights, higher for rarer classes
-
-strengths <- c(0, 0.5, 1, 1.5, 2)  # 0 = no reweighting, higher = more aggressive
-results <- data.frame(strength = strengths, brier = NA)
-
-for (i in seq_along(strengths)) {
-  s <- strengths[i]
-  
-  w_lookup <- inv_freq^s
-  w_lookup <- w_lookup / mean(w_lookup)  # normalize so weights average to 1
-  
-  mut_train_DepMus$w <- w_lookup[mut_train_DepMus$Fav.genre]
-  
-  model <- multinom(Fav.genre ~ Age+Anxiety+Depression+Insomnia+OCD+Primary.streaming.service, data = mut_train_DepMus, weights = mut_test_DepMus$w, trace = FALSE)
-  probs <- predict(model, newdata = mut_test_DepMus, type = "probs")
-  
-  y_matrix <- model.matrix(~ Fav.genre - 1, data = mut_test_DepMus)
-  colnames(y_matrix) <- levels(mut_test_DepMus$Fav.genre)
-  y_matrix <- y_matrix[, colnames(probs)]
-  
-  results$brier[i] <- mean(rowSums((probs - y_matrix)^2))
-}
-
-results
-best_strength <- results$strength[which.min(results$brier)]
-best_strength
-
-table(mut_train_DepMus$Fav.genre, mut_train_DepMus$w)
-```
-
-```{r}
-table(mut_train_DepMus$Fav.genre, mut_train_DepMus$w) |> kable(digits=2)
-```
-
+Hmm, they're basically all similar
 Screw it here's our model:
 
 ## Model
